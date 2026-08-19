@@ -4,11 +4,11 @@ Authentication router — /auth/register and /auth/login.
 import logging
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pymongo.errors import DuplicateKeyError
 
 from app.core.config import settings
-from app.core.deps import CurrentUser, get_current_user, require_role
+from app.core.deps import require_role  # noqa: F401 — available for future use in this router
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.mongo import get_database
 from app.models.user import (
@@ -123,18 +123,3 @@ async def login(body: UserLoginRequest):
 
     logger.info("User logged in: %s (role=%s)", user["email"], user["role"])
     return TokenResponse(access_token=token)
-
-
-# ---------------------------------------------------------------------------
-# GET /auth/me  — temporary Task 1.5 test route
-# Returns the CurrentUser decoded from the JWT so deps.py can be verified.
-# Will be removed once Task 1.7 end-to-end testing is complete.
-# ---------------------------------------------------------------------------
-
-@router.get("/me")
-async def auth_me(current_user: CurrentUser = Depends(get_current_user)):
-    return {
-        "user_id": current_user.user_id,
-        "role": current_user.role,
-        "university_id": current_user.university_id,
-    }
