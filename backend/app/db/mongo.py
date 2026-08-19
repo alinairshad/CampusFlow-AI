@@ -2,19 +2,45 @@
 MongoDB connection setup via Motor (async driver).
 connect_db() and close_db() are called from main.py lifecycle events.
 """
+import logging
+
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 _client: AsyncIOMotorClient | None = None
 
 
 async def connect_db() -> None:
+    """
+    Attempt to connect to MongoDB and verify with a ping.
+
+    Stage-0 safety net: if the connection fails (e.g. Atlas not yet
+    configured), log a warning and leave _client as None so the server
+    can still start.  All endpoints that call get_database() will raise
+    a RuntimeError until a real connection is established — that is the
+    correct behaviour for later stages.
+    """
     global _client
-    _client = AsyncIOMotorClient(settings.MONGODB_URI)
-    # Ping to verify connectivity at startup
-    await _client.admin.command("ping")
-    print("MongoDB connection established.")
+    try:
+        client = AsyncIOMotorClient(
+            settings.MONGODB_URI,
+            serverSelectionTimeoutMS=5000,  # fail fast; don't block startup
+        )
+        await client.admin.command("ping")
+        _client = client
+        logger.info("MongoDB connection established.")
+    except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as exc:
+        _client = None
+        logger.warning(
+            "MongoDB not connected — set MONGODB_URI in .env once Atlas is set up. "
+            "(%s: %s)",
+            type(exc).__name__,
+            exc,
+        )
 
 
 async def close_db() -> None:
