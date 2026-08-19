@@ -1,7 +1,9 @@
 /**
- * Axios client and endpoint wrappers.
- * One file per resource added here in subsequent stages.
- * Implemented incrementally from Stage 1 onward.
+ * Shared axios client.
+ * Token injection is handled per-feature by passing the token explicitly,
+ * or by using the auth-aware client from api/auth.js.
+ * Later stages (assistant, applications, etc.) will import this client
+ * and attach the token via a request interceptor seeded from AuthContext.
  */
 import axios from 'axios'
 
@@ -10,15 +12,6 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-})
-
-// Attach JWT from memory/context on every request (wired in Stage 1)
-apiClient.interceptors.request.use((config) => {
-  const token = window.__campusflow_token__ // replaced by AuthContext in Stage 1
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
 })
 
 export default apiClient

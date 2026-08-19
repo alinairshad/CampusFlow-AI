@@ -1,35 +1,50 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import ProtectedRoute from './auth/ProtectedRoute'
 
-// Pages (stubs — implemented per stage)
-// import LoginPage from './pages/LoginPage'
-// import RegisterPage from './pages/RegisterPage'
-// import StudentDashboard from './pages/StudentDashboard'
-// import AdminDashboard from './pages/AdminDashboard'
-// import AssistantPage from './pages/AssistantPage'
-// import ApplicationsPage from './pages/ApplicationsPage'
-// import DirectoryPage from './pages/DirectoryPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import UnauthorizedPage from './pages/UnauthorizedPage'
+import StudentDashboardPlaceholder from './pages/StudentDashboardPlaceholder'
+import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
 
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Placeholder root — replaced in Stage 1 with auth routing */}
-        <Route
-          path="/"
-          element={
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-              <div className="text-center">
-                <h1 className="text-3xl font-bold text-indigo-600">CampusFlow AI</h1>
-                <p className="mt-2 text-gray-500">Stage 0 setup complete. Implementation begins at Stage 1.</p>
-              </div>
-            </div>
-          }
-        />
-        {/* Catch-all redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+          {/* Student-only routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <StudentDashboardPlaceholder />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin-only routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboardPlaceholder />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Root → /login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/* Catch-all → /login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
-
-export default App
