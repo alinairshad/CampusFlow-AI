@@ -33,6 +33,7 @@ async def connect_db() -> None:
         await client.admin.command("ping")
         _client = client
         logger.info("MongoDB connection established.")
+        await _create_indexes(client[settings.DATABASE_NAME])
     except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as exc:
         _client = None
         logger.warning(
@@ -41,6 +42,13 @@ async def connect_db() -> None:
             type(exc).__name__,
             exc,
         )
+
+
+async def _create_indexes(db) -> None:
+    """Create all required indexes. Safe to call on every startup (idempotent)."""
+    # users.email — unique index (enforces no duplicate accounts)
+    await db["users"].create_index("email", unique=True)
+    logger.info("Database indexes ensured.")
 
 
 async def close_db() -> None:

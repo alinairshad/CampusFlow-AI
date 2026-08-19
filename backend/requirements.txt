@@ -11,7 +11,10 @@ pydantic==2.7.1
 pydantic-settings==2.2.1
 
 # ── Auth ────────────────────────────────────────────────────────────────────
-passlib[bcrypt]==1.7.4
+# passlib removed: passlib 1.7.4 is incompatible with bcrypt >= 4.1 — its
+# wrap-bug detection routine calls bcrypt with a 73-byte secret, which
+# bcrypt 5.x rejects with a hard ValueError. Using bcrypt directly instead.
+bcrypt==5.0.0
 python-jose[cryptography]==3.3.0
 
 # ── Document processing ─────────────────────────────────────────────────────
