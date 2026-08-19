@@ -109,9 +109,60 @@ def _extract_txt(file_bytes: bytes) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Task 2.3 — Chunking (stub, implemented next)
+# Task 2.3 — Chunking
 # ---------------------------------------------------------------------------
 
 def chunk_text(text: str, chunk_size: int = 600, overlap: int = 100) -> list[str]:
-    """Split text into overlapping chunks. Implemented in Task 2.3."""
-    raise NotImplementedError("Implemented in Task 2.3")
+    """
+    Split text into overlapping word-based chunks.
+
+    Parameters
+    ----------
+    text       : extracted document text
+    chunk_size : target number of words per chunk (default 600 ≈ 780 tokens)
+    overlap    : number of words carried over from the previous chunk (default 100)
+
+    Returns
+    -------
+    List of non-empty chunk strings, minimum 1 item even for very short docs.
+
+    Design notes
+    ------------
+    - Word-based (not token-based) to avoid a tokenizer dependency.
+    - 600 words ≈ 780 tokens at the ~1.3 tokens/word average, within the
+      500–800 token target from design.md section 5.1.
+    - Overlap preserves sentence context across chunk boundaries, improving
+      retrieval recall for queries that straddle a boundary.
+    - Words are split on whitespace; original whitespace is not preserved
+      (chunks are rejoined with single spaces).
+    """
+    if not text or not text.strip():
+        return []
+
+    words = text.split()
+
+    # Short document — return as a single chunk
+    if len(words) <= chunk_size:
+        return [" ".join(words)]
+
+    if overlap >= chunk_size:
+        raise ValueError(
+            f"overlap ({overlap}) must be less than chunk_size ({chunk_size})."
+        )
+
+    chunks: list[str] = []
+    step = chunk_size - overlap   # how many words to advance each iteration
+    start = 0
+
+    while start < len(words):
+        end = start + chunk_size
+        chunk_words = words[start:end]
+        chunks.append(" ".join(chunk_words))
+
+        # If this chunk already reaches or passes the end, we're done
+        if end >= len(words):
+            break
+
+        start += step
+
+    return chunks
