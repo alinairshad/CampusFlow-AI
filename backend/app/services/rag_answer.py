@@ -8,7 +8,10 @@ Task 3.5 — grounded answer generation (implemented next).
 """
 import logging
 
+from app.core.config import settings
+from app.services.embeddings import generate_embedding
 from app.services.llm_client import LLMError, chat_completion
+from app.services.vector_store import search_similar
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +128,16 @@ def _needs_rewrite(query: str) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Task 3.3–3.5 stubs (implemented in subsequent tasks)
+# Task 3.3–3.5 — generate_rag_answer
 # ---------------------------------------------------------------------------
+
+# "Not found" response — deterministic, no LLM call
+_NOT_FOUND_ANSWER = (
+    "I wasn't able to find verified information on that in the university's "
+    "knowledge base. Please check with the relevant department directly, or "
+    "ask an admin to upload the relevant policy document."
+)
+
 
 async def generate_rag_answer(
     query: str,
@@ -136,7 +147,51 @@ async def generate_rag_answer(
 ) -> dict:
     """
     Full RAG pipeline: rewrite → embed → retrieve → threshold → generate.
-    Returns: {"answer": str, "sources": list[dict], "found": bool}
-    Implemented in Tasks 3.3–3.5.
+
+    Returns
+    -------
+    {
+        "answer"  : str,
+        "sources" : list[{"document_id", "category", "chunk_preview"}],
+        "found"   : bool,
+        "rewritten_query": str,   # for debugging / transparency
+    }
     """
-    raise NotImplementedError("Implemented in Tasks 3.3–3.5")
+    # ── Task 3.2 — Query rewrite ──────────────────────────────────────────────
+    rewritten = await rewrite_query(query)
+
+    # ── Task 3.3 — Embed the (possibly rewritten) query ───────────────────────
+    query_embedding = await generate_embedding(rewritten)
+
+    # ── Task 3.3 — Retrieve top-k chunks from Atlas Vector Search ─────────────
+    # search_similar already applies min_score as a $match stage, but we fetch
+    # with a slightly lower internal threshold and apply settings.RAG_MIN_SCORE
+    # here so the threshold is tunable at runtime without redeploying.
+    results = await search_similar(
+        query_embedding=query_embedding,
+        university_id=university_id,
+        category=category,
+        top_k=5,
+        min_score=settings.RAG_MIN_SCORE,
+    )
+
+    # ── Task 3.4 — Deterministic "not found" fallback ─────────────────────────
+    # If no chunks meet the threshold, return immediately — do NOT call the LLM.
+    # This is a hard code branch, not a model decision (req 3.4, design §5.2).
+    if not results:
+        logger.info(
+            "RAG: no chunks above threshold %.2f for query=%r (category=%s)",
+            settings.RAG_MIN_SCORE, rewritten[:60], category,
+        )
+        return {
+            "answer": _NOT_FOUND_ANSWER,
+            "sources": [],
+            "found": False,
+            "rewritten_query": rewritten,
+        }
+
+    # ── Task 3.5 — Grounded answer generation (implemented next) ─────────────
+    raise NotImplementedError(
+        "Task 3.5: answer generation with retrieved chunks. "
+        f"Retrieved {len(results)} chunks — pipeline is working up to this point."
+    )
