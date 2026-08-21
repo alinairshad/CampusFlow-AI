@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = "openai/text-embedding-3-small"
     CHAT_MODEL: str = "openai/gpt-4o-mini"
 
+    # RAG retrieval
+    RAG_MIN_SCORE: float = 0.7          # cosine similarity threshold; tune in .env
+
     # University (fixed for MVP single-university deployment)
     UNIVERSITY_ID: str = "university_mvp_001"
 
