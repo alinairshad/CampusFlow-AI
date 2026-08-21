@@ -204,18 +204,47 @@ async def upload_document(
 
 
 # ---------------------------------------------------------------------------
-# GET /admin/documents  (stub — Task 2.7)
+# GET /admin/documents
 # ---------------------------------------------------------------------------
 
 @router.get("/", response_model=DocumentListResponse)
 async def list_documents(
     current_user: CurrentUser = Depends(require_role("admin")),
 ):
-    return {"detail": "Not yet implemented"}
+    """
+    List all documents uploaded for this university, sorted by most recent first.
+    Embeddings are never included in the response.
+    """
+    db = get_database()
+
+    cursor = db["documents"].find(
+        {"university_id": settings.UNIVERSITY_ID},
+        sort=[("uploaded_at", -1)],
+    )
+    docs = await cursor.to_list(length=500)
+
+    items = [
+        DocumentListItem(
+            id=str(doc["_id"]),
+            title=doc["title"],
+            category=doc["category"],
+            filename=doc["filename"],
+            uploaded_by=doc["uploaded_by"],
+            uploaded_at=doc["uploaded_at"],
+            status=doc["status"],
+        )
+        for doc in docs
+    ]
+
+    logger.info(
+        "Admin listed %d documents (university=%s)",
+        len(items), settings.UNIVERSITY_ID,
+    )
+    return DocumentListResponse(documents=items, total=len(items))
 
 
 # ---------------------------------------------------------------------------
-# DELETE /admin/documents/{doc_id}  (stub — Task 2.7)
+# DELETE /admin/documents/{doc_id}
 # ---------------------------------------------------------------------------
 
 @router.delete("/{doc_id}", status_code=204)
@@ -223,4 +252,39 @@ async def delete_document(
     doc_id: str,
     current_user: CurrentUser = Depends(require_role("admin")),
 ):
-    return {"detail": "Not yet implemented"}
+    """
+    Delete a document and cascade-delete all its chunks.
+
+    Returns 204 No Content on success.
+    Returns 404 if the document does not exist or belongs to a different university.
+    """
+    db = get_database()
+
+    # Validate ObjectId format before hitting the DB
+    try:
+        oid = ObjectId(doc_id)
+    except InvalidId:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document '{doc_id}' not found.",
+        )
+
+    # Fetch first to confirm it belongs to this university
+    doc = await db["documents"].find_one(
+        {"_id": oid, "university_id": settings.UNIVERSITY_ID}
+    )
+    if doc is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document '{doc_id}' not found.",
+        )
+
+    # Cascade-delete chunks first, then the document record
+    deleted_chunks = await delete_chunks_by_document(doc_id)
+    await db["documents"].delete_one({"_id": oid})
+
+    logger.info(
+        "Document deleted: id=%s  title=%r  chunks_removed=%d",
+        doc_id, doc.get("title"), deleted_chunks,
+    )
+    # 204 — return nothing
