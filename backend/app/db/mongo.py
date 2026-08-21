@@ -48,6 +48,27 @@ async def _create_indexes(db) -> None:
     """Create all required indexes. Safe to call on every startup (idempotent)."""
     # users.email — unique index (enforces no duplicate accounts)
     await db["users"].create_index("email", unique=True)
+
+    # document_chunks — compound index for filtered retrieval by university + category.
+    # This is a standard B-tree index (NOT the vector index — that one is created
+    # manually in Atlas UI as a Search Index, not via create_index()).
+    await db["document_chunks"].create_index(
+        [("university_id", 1), ("category", 1)],
+        name="document_chunks_university_category",
+    )
+
+    # document_chunks — index on document_id for fast chunk deletion
+    await db["document_chunks"].create_index(
+        "document_id",
+        name="document_chunks_document_id",
+    )
+
+    # documents — index on university_id for admin document listing
+    await db["documents"].create_index(
+        [("university_id", 1), ("uploaded_at", -1)],
+        name="documents_university_uploaded_at",
+    )
+
     logger.info("Database indexes ensured.")
 
 
