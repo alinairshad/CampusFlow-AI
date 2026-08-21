@@ -190,8 +190,146 @@ async def generate_rag_answer(
             "rewritten_query": rewritten,
         }
 
-    # ── Task 3.5 — Grounded answer generation (implemented next) ─────────────
-    raise NotImplementedError(
-        "Task 3.5: answer generation with retrieved chunks. "
-        f"Retrieved {len(results)} chunks — pipeline is working up to this point."
+    # ── Task 3.5 — Grounded answer generation ────────────────────────────────
+    return await _generate_answer(
+        original_query=query,
+        rewritten_query=rewritten,
+        results=results,
+        conversation_history=conversation_history or [],
     )
+
+
+# ---------------------------------------------------------------------------
+# Task 3.5 internals
+# ---------------------------------------------------------------------------
+
+# CHUNK_PREVIEW_CHARS: how many characters of each chunk to show in sources.
+# Long enough for meaningful citation, short enough for a clean UI chip.
+_CHUNK_PREVIEW_CHARS = 200
+
+# System prompt — grounding instruction is explicit and non-negotiable.
+# Key rules enforced here satisfy req 3.5 ("answer only from provided context")
+# and req 11.7 ("never fabricate university-specific facts").
+_RAG_SYSTEM_TEMPLATE = """\
+You are CampusFlow AI, an academic assistant for university students.
+
+Answer the student's question using ONLY the information in the context \
+sections below. Do not use any outside knowledge, do not invent deadlines, \
+fees, office names, or policies that are not explicitly stated in the context.
+
+If the context does not contain enough information to answer fully, say so \
+clearly — do not guess or speculate.
+
+Keep your answer concise, helpful, and in plain language a student can act on.
+
+--- CONTEXT ---
+{context_block}
+--- END CONTEXT ---
+"""
+
+_HISTORY_INTRO = "Recent conversation (for context only — do not answer old questions again):\n"
+
+
+def _build_context_block(results: list[dict]) -> str:
+    """Format retrieved chunks into a numbered context block for the prompt."""
+    lines = []
+    for i, chunk in enumerate(results, start=1):
+        lines.append(
+            f"[{i}] (Category: {chunk['category']})\n{chunk['chunk_text']}"
+        )
+    return "\n\n".join(lines)
+
+
+def _build_sources(results: list[dict]) -> list[dict]:
+    """Build the sources list returned to the frontend."""
+    seen_docs: set[str] = set()
+    sources = []
+    for chunk in results:
+        doc_id = chunk["document_id"]
+        if doc_id in seen_docs:
+            # Deduplicate: only include each source document once,
+            # using the highest-scored chunk as the preview.
+            continue
+        seen_docs.add(doc_id)
+        sources.append({
+            "document_id": doc_id,
+            "category": chunk["category"],
+            "chunk_preview": chunk["chunk_text"][:_CHUNK_PREVIEW_CHARS],
+            "score": round(chunk.get("score", 0.0), 4),
+        })
+    return sources
+
+
+async def _generate_answer(
+    original_query: str,
+    rewritten_query: str,
+    results: list[dict],
+    conversation_history: list[dict],
+) -> dict:
+    """
+    Call the LLM with retrieved context and conversation history to produce
+    a grounded answer.
+
+    Parameters
+    ----------
+    original_query       : the student's raw input (shown to user)
+    rewritten_query      : the expanded query used for retrieval (for logging)
+    results              : list of chunk dicts from search_similar
+    conversation_history : up to 6 recent messages [{role, content}]
+
+    Returns
+    -------
+    {"answer": str, "sources": list[dict], "found": bool, "rewritten_query": str}
+    """
+    context_block = _build_context_block(results)
+    system_prompt = _RAG_SYSTEM_TEMPLATE.format(context_block=context_block)
+
+    # Build messages: system → optional history → current question
+    messages: list[dict] = [{"role": "system", "content": system_prompt}]
+
+    if conversation_history:
+        # Prepend a brief label so the model understands the history's purpose
+        history_text = _HISTORY_INTRO + "\n".join(
+            f"{m['role'].capitalize()}: {m['content']}"
+            for m in conversation_history[-6:]   # cap at last 6 messages
+        )
+        messages.append({"role": "user", "content": history_text})
+        messages.append({
+            "role": "assistant",
+            "content": "Understood. I will use this context when answering.",
+        })
+
+    messages.append({"role": "user", "content": original_query})
+
+    try:
+        answer = await chat_completion(
+            messages=messages,
+            temperature=0.2,   # low — we want factual, not creative
+            max_tokens=512,
+            json_mode=False,
+        )
+    except LLMError as exc:
+        logger.error("RAG generation LLM call failed: %s", exc)
+        return {
+            "answer": (
+                "I encountered an error generating an answer. "
+                "Please try again in a moment."
+            ),
+            "sources": _build_sources(results),
+            "found": False,
+            "rewritten_query": rewritten_query,
+        }
+
+    sources = _build_sources(results)
+
+    logger.info(
+        "RAG answer generated: query=%r  chunks_used=%d  sources=%d",
+        original_query[:60], len(results), len(sources),
+    )
+
+    return {
+        "answer": answer,
+        "sources": sources,
+        "found": True,
+        "rewritten_query": rewritten_query,
+    }
