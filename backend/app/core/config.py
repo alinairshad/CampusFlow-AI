@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     CHAT_MODEL: str = "openai/gpt-4o-mini"
 
     # RAG retrieval
-    RAG_MIN_SCORE: float = 0.7          # cosine similarity threshold; tune in .env
+    RAG_MIN_SCORE: float = 0.7          # cosine similarity threshold for Q&A; tune in .env
+    ACTION_PLAN_MIN_SCORE: float = 0.65 # lower threshold for problem queries — problem
+                                        # descriptions are more paraphrased from policy text
 
     # University (fixed for MVP single-university deployment)
     UNIVERSITY_ID: str = "university_mvp_001"
