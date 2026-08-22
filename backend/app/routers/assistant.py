@@ -12,6 +12,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, field_validator
 
 from app.core.deps import CurrentUser, get_current_user
+from app.db.mongo import get_database
+from app.models.conversation import (
+    ConversationDetailResponse,
+    ConversationListResponse,
+    ConversationMessage,
+    ConversationSource,
+    ConversationSummary,
+)
 from app.services.conversation import get_conversation_history, save_conversation_turn
 from app.services.intent_classifier import classify_intent
 from app.services.rag_answer import generate_rag_answer
@@ -178,23 +186,123 @@ async def query_assistant(
 
 
 # ---------------------------------------------------------------------------
-# GET /assistant/conversations  (stub — Task 3.8)
+# GET /assistant/conversations
 # ---------------------------------------------------------------------------
 
-@router.get("/conversations")
+@router.get("/conversations", response_model=ConversationListResponse)
 async def list_conversations(
     current_user: CurrentUser = Depends(get_current_user),
 ):
-    return {"detail": "Not yet implemented — Task 3.8"}
+    """
+    List the authenticated student's conversations, newest first, max 20.
+    Returns one summary per conversation (id, first user message preview,
+    message count, created_at, updated_at).
+    """
+    db = get_database()
+
+    cursor = db["conversations"].find(
+        {
+            "student_id": current_user.user_id,
+            "university_id": current_user.university_id,
+        },
+        sort=[("updated_at", -1)],
+        limit=20,
+    )
+    docs = await cursor.to_list(length=20)
+
+    summaries = []
+    for doc in docs:
+        messages = doc.get("messages", [])
+        # First user message as the preview
+        first_user = next((m for m in messages if m.get("role") == "user"), None)
+        preview = (first_user["content"][:80] if first_user else "") + (
+            "…" if first_user and len(first_user["content"]) > 80 else ""
+        )
+        summaries.append(
+            ConversationSummary(
+                id=str(doc["_id"]),
+                first_message_preview=preview,
+                message_count=len(messages),
+                created_at=doc["created_at"],
+                updated_at=doc["updated_at"],
+            )
+        )
+
+    logger.info(
+        "Listed %d conversations for student=%s",
+        len(summaries), current_user.user_id,
+    )
+    return ConversationListResponse(conversations=summaries, total=len(summaries))
 
 
 # ---------------------------------------------------------------------------
-# GET /assistant/conversations/{conv_id}  (stub — Task 3.8)
+# GET /assistant/conversations/{conv_id}
 # ---------------------------------------------------------------------------
 
-@router.get("/conversations/{conv_id}")
-async def get_conversation(
+@router.get("/conversations/{conv_id}", response_model=ConversationDetailResponse)
+async def get_conversation_detail(
     conv_id: str,
     current_user: CurrentUser = Depends(get_current_user),
 ):
-    return {"detail": "Not yet implemented — Task 3.8"}
+    """
+    Return the full message list for a conversation, including sources.
+    404 if the conversation does not exist or belongs to another student.
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
+
+    db = get_database()
+
+    try:
+        oid = ObjectId(conv_id)
+    except InvalidId:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Conversation not found.")
+
+    doc = await db["conversations"].find_one(
+        {
+            "_id": oid,
+            "student_id": current_user.user_id,       # ownership check
+            "university_id": current_user.university_id,
+        }
+    )
+
+    if doc is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Conversation not found.")
+
+    # Deserialise messages into Pydantic models
+    messages = []
+    for m in doc.get("messages", []):
+        sources = [
+            ConversationSource(
+                document_id=s.get("document_id", ""),
+                category=s.get("category", ""),
+                chunk_preview=s.get("chunk_preview", ""),
+                score=s.get("score", 0.0),
+            )
+            for s in m.get("sources", [])
+        ]
+        messages.append(
+            ConversationMessage(
+                role=m["role"],
+                content=m["content"],
+                type=m.get("type"),
+                sources=sources,
+                found=m.get("found"),
+                created_at=m["created_at"],
+            )
+        )
+
+    logger.info(
+        "Conversation detail fetched: id=%s  student=%s  messages=%d",
+        conv_id, current_user.user_id, len(messages),
+    )
+
+    return ConversationDetailResponse(
+        id=conv_id,
+        student_id=doc["student_id"],
+        messages=messages,
+        created_at=doc["created_at"],
+        updated_at=doc["updated_at"],
+    )
