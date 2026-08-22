@@ -23,6 +23,7 @@ from app.models.conversation import (
 from app.services.conversation import get_conversation_history, save_conversation_turn
 from app.services.intent_classifier import classify_intent
 from app.services.rag_answer import generate_rag_answer
+from app.services.action_plan import generate_action_plan
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -45,21 +46,16 @@ class AssistantQueryRequest(BaseModel):
 
 class AssistantQueryResponse(BaseModel):
     conversation_id: str
-    type: str                    # "knowledge" | "problem" | "application"
-    answer: str
+    type: str                            # "knowledge" | "problem" | "application"
+    answer: str                          # for problem: this is next_action text
     sources: list[dict]
     found: bool
+    action_plan: Optional[dict] = None  # populated only when type == "problem"
 
 
 # ---------------------------------------------------------------------------
 # Placeholder text for unimplemented intents
 # ---------------------------------------------------------------------------
-
-_PROBLEM_PLACEHOLDER = (
-    "Your issue has been noted as a problem that requires action steps. "
-    "The step-by-step action plan feature is coming in a later stage — "
-    "please contact the relevant department directly in the meantime."
-)
 
 _APPLICATION_PLACEHOLDER = (
     "It looks like you need a formal application or letter. "
@@ -85,7 +81,7 @@ async def query_assistant(
       2. Classify intent → {category, type}
       3. Route by type:
            knowledge   → RAG pipeline (embed → retrieve → threshold → generate)
-           problem     → placeholder (Stage 4)
+           problem     → Action Plan pipeline (embed → retrieve → structured plan)
            application → placeholder (Stage 5)
       4. Persist the turn and return the response with conversation_id
     """
@@ -122,6 +118,7 @@ async def query_assistant(
     answer: str
     sources: list[dict] = []
     found: bool = False
+    action_plan: dict | None = None
 
     if intent_type == "knowledge":
         try:
@@ -146,9 +143,34 @@ async def query_assistant(
             ) from exc
 
     elif intent_type == "problem":
-        # Stage 4 — action plan not yet implemented
-        answer = _PROBLEM_PLACEHOLDER
-        found = False
+        try:
+            plan_result = await generate_action_plan(
+                query=body.query,
+                university_id=university_id,
+                category=None,
+                conversation_history=history,
+            )
+            # answer = next_action (assumption C: Option 1)
+            answer = plan_result["next_action"]
+            sources = plan_result["sources"]
+            found = plan_result["found"]
+            # Full structured plan returned separately (assumption D)
+            if found:
+                action_plan = {
+                    "department":    plan_result["department"],
+                    "required_docs": plan_result["required_docs"],
+                    "steps":         plan_result["steps"],
+                    "next_action":   plan_result["next_action"],
+                }
+        except Exception as exc:
+            logger.error(
+                "Action plan error for student=%s query=%r: %s",
+                student_id, body.query[:60], exc, exc_info=True,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="An error occurred while generating your action plan. Please try again.",
+            ) from exc
 
     else:
         # intent_type == "application" — Stage 5 not yet implemented
@@ -166,6 +188,7 @@ async def query_assistant(
             sources=sources,
             found=found,
             conversation_id=body.conversation_id,
+            action_plan=action_plan,
         )
     except Exception as exc:
         # Persistence failure is non-fatal — the student still gets their answer
@@ -173,7 +196,6 @@ async def query_assistant(
             "Failed to persist conversation turn for student=%s: %s",
             student_id, exc, exc_info=True,
         )
-        # Fall back: use whatever id we were given (or a placeholder)
         conversation_id = body.conversation_id or "persistence-failed"
 
     return AssistantQueryResponse(
@@ -182,6 +204,7 @@ async def query_assistant(
         answer=answer,
         sources=sources,
         found=found,
+        action_plan=action_plan,
     )
 
 

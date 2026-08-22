@@ -34,6 +34,7 @@ async def save_conversation_turn(
     sources: list[dict],
     found: bool,
     conversation_id: str | None = None,
+    action_plan: dict | None = None,
 ) -> str:
     """
     Persist one user→assistant exchange.
@@ -47,7 +48,12 @@ async def save_conversation_turn(
     student_id          : user._id string
     university_id       : settings.UNIVERSITY_ID
     user_message        : the student's raw query
-    assistant_message   : the generated answer
+    assistant_message   : the generated answer (or next_action for problems)
+    intent_type         : "knowledge" | "problem" | "application"
+    sources             : list of source dicts from the pipeline
+    found               : whether relevant content was found
+    conversation_id     : existing conversation _id (string) or None
+    action_plan         : full structured plan dict for problem responses (assumption F)
     intent_type         : "knowledge" | "problem" | "application"
     sources             : list of source dicts from generate_rag_answer
     found               : whether relevant chunks were found
@@ -75,6 +81,7 @@ async def save_conversation_turn(
         "type": intent_type,
         "sources": sources,
         "found": found,
+        "action_plan": action_plan,   # None for knowledge/application; dict for problem
         "created_at": now,
     }
 
@@ -111,6 +118,7 @@ async def save_conversation_turn(
             sources=sources,
             found=found,
             conversation_id=None,
+            action_plan=action_plan,
         )
 
     result = await db[CONVERSATIONS_COLLECTION].update_one(
@@ -140,6 +148,7 @@ async def save_conversation_turn(
             sources=sources,
             found=found,
             conversation_id=None,
+            action_plan=action_plan,
         )
 
     logger.info(
