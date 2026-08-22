@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
 import StudentDashboardPlaceholder from './pages/StudentDashboardPlaceholder'
 import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
+import ChatPage from './features/assistant/ChatPage'
 
 export default function App() {
   return (
@@ -24,6 +25,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <StudentDashboardPlaceholder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assistant"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <ChatPage />
               </ProtectedRoute>
             }
           />
