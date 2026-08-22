@@ -59,15 +59,24 @@ export default function StudentDashboardPlaceholder() {
         {/* Placeholder cards for future stages */}
         <div className="grid grid-cols-2 gap-4">
           {[
-            { label: 'Applications', sub: 'Coming — Stage 5' },
-            { label: 'Directory',    sub: 'Coming — Stage 6' },
-          ].map(({ label, sub }) => (
-            <div key={label}
-                 className="bg-white rounded-2xl border border-gray-100 p-5 opacity-60 cursor-not-allowed">
-              <p className="text-sm font-semibold text-gray-700">{label}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
-            </div>
-          ))}
+            { label: 'Applications', sub: 'Coming — Stage 5', to: '/applications', live: true },
+            { label: 'Directory',    sub: 'Find offices & departments', to: '/directory', live: true },
+          ].map(({ label, sub, to, live }) =>
+            live ? (
+              <Link key={label} to={to}
+                    className="bg-white rounded-2xl border border-gray-200 p-5
+                               hover:border-indigo-300 hover:shadow-sm transition-all">
+                <p className="text-sm font-semibold text-gray-700">{label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+              </Link>
+            ) : (
+              <div key={label}
+                   className="bg-white rounded-2xl border border-gray-100 p-5 opacity-60 cursor-not-allowed">
+                <p className="text-sm font-semibold text-gray-700">{label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+              </div>
+            )
+          )}
         </div>
       </main>
     </div>

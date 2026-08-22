@@ -9,6 +9,7 @@ import StudentDashboardPlaceholder from './pages/StudentDashboardPlaceholder'
 import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
 import ChatPage from './features/assistant/ChatPage'
 import ApplicationPage from './features/applications/ApplicationPage'
+import DirectoryPage from './features/directory/DirectoryPage'
 
 export default function App() {
   return (
@@ -42,6 +43,15 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <ApplicationPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* /directory is public data but still requires login for the student context */}
+          <Route
+            path="/directory"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <DirectoryPage />
               </ProtectedRoute>
             }
           />
