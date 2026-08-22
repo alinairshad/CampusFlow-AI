@@ -126,3 +126,31 @@ class StudentProfileResponse(BaseModel):
     semester: str
     batch: str
     interests: list[str] = []
+
+
+class DashboardApplicationItem(BaseModel):
+    """One application row in the dashboard widget."""
+    id: str
+    application_type: str
+    type_label: str
+    status: str
+    created_at: datetime
+
+
+class DashboardConversationItem(BaseModel):
+    """One conversation row in the dashboard widget."""
+    id: str
+    first_message_preview: str
+    message_count: int
+    updated_at: datetime
+
+
+class DashboardResponse(BaseModel):
+    """
+    Single aggregated response for GET /students/dashboard.
+    Returns profile + 5 recent applications + 3 recent conversations
+    in one call so the frontend makes only one network request on load.
+    """
+    profile: StudentProfileResponse
+    recent_applications: list[DashboardApplicationItem]
+    recent_conversations: list[DashboardConversationItem]
