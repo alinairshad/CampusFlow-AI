@@ -69,6 +69,12 @@ async def _create_indexes(db) -> None:
         name="documents_university_uploaded_at",
     )
 
+    # applications — index for student application history queries
+    await db["applications"].create_index(
+        [("student_id", 1), ("created_at", -1)],
+        name="applications_student_created_at",
+    )
+
     logger.info("Database indexes ensured.")
 
 
