@@ -11,7 +11,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.security import decode_access_token
 
-bearer_scheme = HTTPBearer()
+# auto_error=False so FastAPI does NOT raise 403 on a missing/malformed
+# Authorization header — we raise 401 ourselves in get_current_user instead.
+# Requirement 1.6 requires 401 for all unauthenticated access.
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 @dataclass
@@ -23,12 +26,26 @@ class CurrentUser:
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> CurrentUser:
     """
     Validate the Bearer JWT and return the decoded identity.
-    Raises 401 if the token is missing, malformed, or expired.
+    Raises 401 for all unauthenticated/invalid cases (req 1.6):
+      - No Authorization header
+      - Wrong scheme (not Bearer)
+      - Malformed, expired, or invalid token
+      - Token missing required claims
     """
+    _unauthorized = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required.",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    # No header, or header present but wrong scheme (e.g. Basic)
+    if credentials is None:
+        raise _unauthorized
+
     token = credentials.credentials
     payload = decode_access_token(token)
 
