@@ -8,6 +8,7 @@ import UnauthorizedPage from './pages/UnauthorizedPage'
 import StudentDashboardPlaceholder from './pages/StudentDashboardPlaceholder'
 import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
 import ChatPage from './features/assistant/ChatPage'
+import ApplicationPage from './features/applications/ApplicationPage'
 
 export default function App() {
   return (
@@ -33,6 +34,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applications"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <ApplicationPage />
               </ProtectedRoute>
             }
           />
