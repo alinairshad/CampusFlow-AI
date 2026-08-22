@@ -1,12 +1,11 @@
 /**
- * Admin Dashboard — document management UI.
- * Replaces the Stage 0 placeholder. Full admin dashboard (stats, directory)
- * comes in Stage 8; this page delivers the document upload/list feature (Stage 2).
+ * Admin Dashboard — document management + directory management.
  */
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import DocumentUploadForm from '../features/admin/DocumentUploadForm'
 import DocumentList from '../features/admin/DocumentList'
+import DirectoryManager from '../features/admin/DirectoryManager'
 import { listDocuments } from '../api/documents'
 
 export default function AdminDashboardPlaceholder() {
@@ -61,32 +60,49 @@ export default function AdminDashboardPlaceholder() {
       {/* Main content */}
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Knowledge Base</h1>
+          <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Upload university documents to power the AI assistant.
+            Manage the university knowledge base and directory.
           </p>
         </div>
 
-        {/* Upload form */}
-        <DocumentUploadForm
-          token={token}
-          onUploaded={fetchDocuments}
-        />
+        {/* ── Knowledge Base ─────────────────────────────────────────────── */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            Knowledge Base
+          </h2>
 
-        {/* List error */}
-        {listError && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-            {listError}
-          </p>
-        )}
+          {/* Upload form */}
+          <DocumentUploadForm
+            token={token}
+            onUploaded={fetchDocuments}
+          />
 
-        {/* Document list */}
-        <DocumentList
-          documents={documents}
-          token={token}
-          loading={loading}
-          onDeleted={fetchDocuments}
-        />
+          {/* List error */}
+          {listError && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 mt-3">
+              {listError}
+            </p>
+          )}
+
+          {/* Document list */}
+          <div className="mt-4">
+            <DocumentList
+              documents={documents}
+              token={token}
+              loading={loading}
+              onDeleted={fetchDocuments}
+            />
+          </div>
+        </div>
+
+        {/* ── University Directory ──────────────────────────────────────── */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            University Directory
+          </h2>
+          <DirectoryManager token={token} />
+        </div>
       </main>
     </div>
   )
