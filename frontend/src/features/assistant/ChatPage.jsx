@@ -51,7 +51,7 @@ function UserBubble({ content }) {
   )
 }
 
-function AssistantBubble({ content, type, sources, found, actionPlan }) {
+function AssistantBubble({ content, type, sources, found, actionPlan, conversationId }) {
   const isProblem = type === 'problem'
 
   return (
@@ -71,6 +71,7 @@ function AssistantBubble({ content, type, sources, found, actionPlan }) {
               actionPlan={actionPlan}
               sources={sources}
               found={found}
+              conversationId={conversationId}
             />
           ) : (
             // ── Knowledge / Application: plain text layout ─────────────────
@@ -232,6 +233,7 @@ export default function ChatPage() {
                 sources={m.sources}
                 found={m.found}
                 actionPlan={m.actionPlan}
+                conversationId={convId}
               />
             ),
           )}

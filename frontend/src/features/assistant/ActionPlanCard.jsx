@@ -1,25 +1,42 @@
 /**
  * ActionPlanCard — rendered inside AssistantBubble when type === "problem".
  *
- * Sections:
- *   1. Department badge
- *   2. Required documents chips
- *   3. Numbered step list
- *   4. Highlighted "Next Action" box
- *   5. "Generate Application" button (disabled, Stage 5 tooltip)
- *   6. Source citation chips (same as knowledge answers)
- *
  * Props:
- *   actionPlan : {
- *     department    : string,
- *     required_docs : string[],
- *     steps         : string[],
- *     next_action   : string,
- *   }
- *   sources    : Source[]   — same shape as knowledge sources
- *   found      : boolean    — if false, show not-found fallback instead
+ *   actionPlan     : { department, required_docs[], steps[], next_action }
+ *   sources        : Source[]
+ *   found          : boolean
+ *   conversationId : string | null  — passed through from ChatPage convId
  */
+import { useNavigate } from 'react-router-dom'
 import SourceChip from './SourceChip'
+
+// ---------------------------------------------------------------------------
+// Client-side application type suggestion map (assumption G)
+// Maps keywords found in department/steps/next_action to a suggested type.
+// Falls back to 'leave_request' (most generic) if nothing matches.
+// ---------------------------------------------------------------------------
+const TYPE_KEYWORDS = [
+  { type: 'fee_extension',       words: ['fee', 'finance', 'accounts', 'payment', 'challan', 'penalty'] },
+  { type: 'scholarship_request', words: ['scholarship', 'financial aid', 'award', 'merit'] },
+  { type: 'exam_related',        words: ['exam', 'examination', 'admit', 'invigilat'] },
+  { type: 'course_withdrawal',   words: ['course', 'withdrawal', 'drop', 'subject'] },
+  { type: 'department_transfer', words: ['transfer', 'department', 'faculty'] },
+  { type: 'transcript_request',  words: ['transcript', 'certificate', 'records'] },
+]
+
+function suggestApplicationType(actionPlan) {
+  if (!actionPlan) return 'leave_request'
+  const haystack = [
+    actionPlan.department,
+    actionPlan.next_action,
+    ...(actionPlan.steps || []),
+  ].join(' ').toLowerCase()
+
+  for (const { type, words } of TYPE_KEYWORDS) {
+    if (words.some((w) => haystack.includes(w))) return type
+  }
+  return 'leave_request'
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -116,35 +133,21 @@ function NextActionBox({ nextAction }) {
   )
 }
 
-function GenerateApplicationButton() {
+function GenerateApplicationButton({ onClick }) {
   return (
-    <div className="relative group inline-block w-full">
-      <button
-        disabled
-        aria-disabled="true"
-        className="w-full flex items-center justify-center gap-2 text-sm font-medium
-                   bg-gray-100 text-gray-400 border border-gray-200 rounded-xl py-2.5
-                   cursor-not-allowed select-none"
-      >
-        {/* Document-plus icon */}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-             className="w-4 h-4 shrink-0">
-          <path d="M3 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7.586A1.5 1.5 0 0 0 12 13.586V6.414L9.586 4H4.5A.5.5 0 0 0 4 4.5V3a1 1 0 0 0-1-1Zm5.5 1 2.5 2.5H8.5V3Z" />
-          <path d="M8 9.5a.5.5 0 0 1 .5-.5h1v-1a.5.5 0 0 1 1 0v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1-.5-.5Z" />
-        </svg>
-        Generate Application
-      </button>
-      {/* Tooltip */}
-      <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2
-                      mb-2 w-48 text-center text-xs text-white bg-gray-700 rounded-lg
-                      px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity
-                      whitespace-normal z-10">
-        Application generation coming in Stage 5
-        {/* Arrow */}
-        <div className="absolute top-full left-1/2 -translate-x-1/2
-                        border-4 border-transparent border-t-gray-700" />
-      </div>
-    </div>
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-center gap-2 text-sm font-medium
+                 bg-indigo-600 hover:bg-indigo-700 text-white
+                 rounded-xl py-2.5 transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+           className="w-4 h-4 shrink-0">
+        <path d="M3 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h7.586A1.5 1.5 0 0 0 12 13.586V6.414L9.586 4H4.5A.5.5 0 0 0 4 4.5V3a1 1 0 0 0-1-1Zm5.5 1 2.5 2.5H8.5V3Z" />
+        <path d="M8 9.5a.5.5 0 0 1 .5-.5h1v-1a.5.5 0 0 1 1 0v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1-.5-.5Z" />
+      </svg>
+      Generate Application
+    </button>
   )
 }
 
@@ -179,7 +182,9 @@ function NotFoundCard() {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function ActionPlanCard({ actionPlan, sources = [], found }) {
+export default function ActionPlanCard({ actionPlan, sources = [], found, conversationId }) {
+  const navigate = useNavigate()
+
   if (!found || !actionPlan) {
     return <NotFoundCard />
   }
@@ -187,6 +192,15 @@ export default function ActionPlanCard({ actionPlan, sources = [], found }) {
   const validDocs = (actionPlan.required_docs || []).filter(
     (d) => !d.toLowerCase().includes('not specified')
   )
+
+  function handleGenerateApplication() {
+    navigate('/applications', {
+      state: {
+        conversationId: conversationId || null,
+        applicationType: suggestApplicationType(actionPlan),
+      },
+    })
+  }
 
   return (
     <div className="space-y-3">
@@ -222,8 +236,8 @@ export default function ActionPlanCard({ actionPlan, sources = [], found }) {
         </div>
       )}
 
-      {/* Generate Application — disabled until Stage 5 */}
-      <GenerateApplicationButton />
+      {/* Generate Application — live (Stage 5.11) */}
+      <GenerateApplicationButton onClick={handleGenerateApplication} />
     </div>
   )
 }
