@@ -75,6 +75,21 @@ async def _create_indexes(db) -> None:
         name="applications_student_created_at",
     )
 
+    # departments_offices — compound index for university-scoped listing + sorting
+    await db["departments_offices"].create_index(
+        [("university_id", 1), ("name", 1)],
+        name="departments_offices_university_name",
+    )
+
+    # departments_offices — text index for keyword search (req 7.3, 8.1)
+    # Covers name, services[], and description fields.
+    # Standard MongoDB text index — no manual Atlas setup needed (unlike vector index).
+    await db["departments_offices"].create_index(
+        [("name", "text"), ("services", "text"), ("description", "text")],
+        name="departments_offices_text",
+        default_language="english",
+    )
+
     logger.info("Database indexes ensured.")
 
 
