@@ -6,6 +6,7 @@ import { useAuth } from '../auth/AuthContext'
 import DocumentUploadForm from '../features/admin/DocumentUploadForm'
 import DocumentList from '../features/admin/DocumentList'
 import DirectoryManager from '../features/admin/DirectoryManager'
+import StatsWidget from '../features/admin/StatsWidget'
 import { listDocuments } from '../api/documents'
 
 export default function AdminDashboardPlaceholder() {
@@ -65,6 +66,9 @@ export default function AdminDashboardPlaceholder() {
             Manage the university knowledge base and directory.
           </p>
         </div>
+
+        {/* ── Stats overview ─────────────────────────────────────────────── */}
+        <StatsWidget token={token} />
 
         {/* ── Knowledge Base ─────────────────────────────────────────────── */}
         <div>
