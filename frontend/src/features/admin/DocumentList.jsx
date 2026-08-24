@@ -101,7 +101,7 @@ export default function DocumentList({ documents, token, loading, onDeleted }) {
       ) : (
         <ul className="divide-y divide-gray-100">
           {documents.map((doc) => (
-            <li key={doc.id} className="px-6 py-4 flex items-start gap-4">
+            <li key={doc.id} className="px-4 sm:px-6 py-4 flex items-start gap-3">
               {/* File type icon */}
               <div className="mt-0.5 shrink-0 w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
                 <span className="text-xs font-bold text-indigo-500 uppercase">
@@ -111,9 +111,11 @@ export default function DocumentList({ documents, token, loading, onDeleted }) {
 
               {/* Main info */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{doc.title}</p>
-                <p className="text-xs text-gray-400 truncate mt-0.5">{doc.filename}</p>
-                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                {/* Title — truncate on sm+, wrap on xs to stay readable */}
+                <p className="text-sm font-medium text-gray-800 break-words sm:truncate">{doc.title}</p>
+                {/* Filename hidden on very narrow screens to avoid overflow */}
+                <p className="text-xs text-gray-400 truncate mt-0.5 hidden xs:block sm:block">{doc.filename}</p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1.5">
                   <CategoryBadge category={doc.category} />
                   <StatusBadge status={doc.status} />
                   <span className="text-xs text-gray-400">{formatDate(doc.uploaded_at)}</span>

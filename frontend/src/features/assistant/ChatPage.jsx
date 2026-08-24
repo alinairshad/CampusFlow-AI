@@ -44,7 +44,7 @@ function TypingIndicator() {
 function UserBubble({ content }) {
   return (
     <div className="flex justify-end mb-4">
-      <div className="max-w-[75%] bg-indigo-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 shadow-sm">
+      <div className="max-w-[90%] sm:max-w-[75%] bg-indigo-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 shadow-sm">
         <p className="text-sm whitespace-pre-wrap leading-relaxed">{content}</p>
       </div>
     </div>
@@ -61,7 +61,7 @@ function AssistantBubble({ content, type, sources, found, actionPlan, conversati
         <span className="text-indigo-500 text-xs font-bold">AI</span>
       </div>
 
-      <div className="max-w-[78%] space-y-1.5">
+      <div className="max-w-[92%] sm:max-w-[78%] space-y-1.5">
         {/* Bubble */}
         <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
 
@@ -253,7 +253,7 @@ export default function ChatPage() {
       )}
 
       {/* ── Input bar ───────────────────────────────────────────────────── */}
-      <div className="bg-white border-t border-gray-200 px-4 py-3 shrink-0">
+      <div className="bg-white border-t border-gray-200 px-3 sm:px-4 py-3 shrink-0">
         <div className="max-w-2xl mx-auto flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -261,9 +261,9 @@ export default function ChatPage() {
             onChange={(e) => { setInput(e.target.value); setError('') }}
             onKeyDown={handleKeyDown}
             disabled={loading}
-            placeholder="Ask a question… (Enter to send, Shift+Enter for new line)"
+            placeholder="Ask a question…"
             rows={1}
-            className="flex-1 resize-none border border-gray-300 rounded-xl px-3 py-2.5 text-sm
+            className="flex-1 min-w-0 resize-none border border-gray-300 rounded-xl px-3 py-2.5 text-sm
                        focus:outline-none focus:ring-2 focus:ring-indigo-400
                        disabled:opacity-50 leading-relaxed max-h-40 overflow-y-auto"
             style={{ minHeight: '42px' }}
