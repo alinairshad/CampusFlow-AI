@@ -97,7 +97,7 @@ async def close_db() -> None:
     global _client
     if _client:
         _client.close()
-        print("MongoDB connection closed.")
+        logger.info("MongoDB connection closed.")
 
 
 def get_database():
