@@ -36,7 +36,7 @@ router = APIRouter()
 
 @router.get("/")
 async def unified_search(
-    q: str = Query(default="", description="Natural-language search query"),
+    q: str = Query(default="", max_length=500, description="Natural-language search query"),
 ):
     """
     Unified search across knowledge-base documents and the university directory.

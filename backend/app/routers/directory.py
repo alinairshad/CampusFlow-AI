@@ -60,7 +60,7 @@ async def list_entries():
 
 @router.get("/search", response_model=DirectoryListResponse)
 async def search_entries(
-    q: str = Query(default="", description="Search keywords"),
+    q: str = Query(default="", max_length=500, description="Search keywords"),
 ):
     """
     Keyword search across name, services, and description using MongoDB $text.

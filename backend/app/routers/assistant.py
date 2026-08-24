@@ -41,7 +41,24 @@ class AssistantQueryRequest(BaseModel):
     def query_not_empty(cls, v: str) -> str:
         if not v or not v.strip():
             raise ValueError("Query must not be empty.")
+        if len(v) > 1000:
+            raise ValueError("Query must be 1000 characters or fewer.")
         return v.strip()
+
+    @field_validator("conversation_id")
+    @classmethod
+    def conversation_id_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            return None
+        # MongoDB ObjectId is exactly 24 hex characters
+        if len(v) != 24 or not all(c in "0123456789abcdefABCDEF" for c in v):
+            raise ValueError(
+                "conversation_id must be a 24-character hexadecimal MongoDB ObjectId."
+            )
+        return v
 
 
 class AssistantQueryResponse(BaseModel):
