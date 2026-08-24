@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, field_validator
 
 from app.core.deps import CurrentUser, get_current_user
+from app.core.rate_limit import limit_assistant_query
 from app.db.mongo import get_database
 from app.models.conversation import (
     ConversationDetailResponse,
@@ -88,7 +89,7 @@ _APPLICATION_PLACEHOLDER = (
 @router.post("/query", response_model=AssistantQueryResponse)
 async def query_assistant(
     body: AssistantQueryRequest,
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: CurrentUser = Depends(limit_assistant_query),
 ):
     """
     Main AI assistant endpoint.

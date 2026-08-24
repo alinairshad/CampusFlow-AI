@@ -16,6 +16,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.core.deps import CurrentUser, get_current_user
+from app.core.rate_limit import limit_application_generate
 from app.db.mongo import get_database
 from app.services.application_generator import (
     APP_TYPE_LABELS,
@@ -78,7 +79,7 @@ class ApplicationListResponse(BaseModel):
 )
 async def generate_application_endpoint(
     body: ApplicationGenerateRequest,
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: CurrentUser = Depends(limit_application_generate),
 ):
     """
     Generate a formal application or ask a clarifying question.
