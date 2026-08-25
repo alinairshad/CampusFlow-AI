@@ -1,0 +1,43 @@
+# Railway deployment configuration for the CampusFlow AI backend.
+# Docs: https://docs.railway.com/guides/config-as-code
+#
+# MONOREPO NOTE:
+# This file lives at backend/railway.toml.
+# In Railway's dashboard → Service → Settings, you must set:
+#   Root Directory:  backend
+#   Config File:     /backend/railway.toml
+# Railway does NOT follow Root Directory automatically for config files —
+# the absolute path must be specified explicitly in the dashboard.
+#
+# NOTE: Railway's config-as-code schema supports [build] and [deploy] only.
+# Environment variables cannot be committed here — set them all in the
+# Railway dashboard → Variables tab (see list at the bottom of this file).
+
+[build]
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# ── Variables to set in Railway dashboard → Variables tab ────────────────────
+#
+# Non-sensitive (no secret value):
+#   DATABASE_NAME              = campusflow
+#   JWT_ALGORITHM              = HS256
+#   ACCESS_TOKEN_EXPIRE_MINUTES = 60
+#   LLM_API_BASE               = https://openrouter.ai/api/v1
+#   EMBEDDING_MODEL            = openai/text-embedding-3-small
+#   CHAT_MODEL                 = openai/gpt-4o-mini
+#   RAG_MIN_SCORE              = 0.7
+#   ACTION_PLAN_MIN_SCORE      = 0.65
+#   UNIVERSITY_ID              = uni_001
+#
+# Secrets (set with Railway's secret variable UI, not plain text):
+#   MONGODB_URI      — Atlas connection string (contains credentials)
+#   JWT_SECRET       — long random hex: python -c "import secrets; print(secrets.token_hex(32))"
+#   LLM_API_KEY      — OpenRouter API key
+#   ALLOWED_ORIGINS  — https://your-app.vercel.app,http://localhost:5173
