@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: campusflow-ai-backend
+    runtime: python
+    region: oregon        # closest to most users; change to frankfurt/singapore if preferred
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+
+    envVars:
+      # ── Non-sensitive vars — safe to commit ──────────────────────────────
+      # These have no secret value; setting them here avoids manual entry
+      # for every new deploy or environment reset.
+      - key: DATABASE_NAME
+        value: campusflow
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: LLM_API_BASE
+        value: https://openrouter.ai/api/v1
+      - key: EMBEDDING_MODEL
+        value: openai/text-embedding-3-small
+      - key: CHAT_MODEL
+        value: openai/gpt-4o-mini
+      - key: RAG_MIN_SCORE
+        value: "0.7"
+      - key: ACTION_PLAN_MIN_SCORE
+        value: "0.65"
+      - key: UNIVERSITY_ID
+        value: uni_001
+
+      # ── Secrets — DO NOT add here ─────────────────────────────────────────
+      # Set these manually in Render's dashboard Environment tab:
+      #   MONGODB_URI       (Atlas connection string — contains credentials)
+      #   JWT_SECRET        (long random hex string)
+      #   LLM_API_KEY       (OpenRouter API key)
+      #   ALLOWED_ORIGINS   (comma-separated: https://your-app.vercel.app,http://localhost:5173)
