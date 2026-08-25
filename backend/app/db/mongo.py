@@ -29,6 +29,8 @@ async def connect_db() -> None:
         client = AsyncIOMotorClient(
             settings.MONGODB_URI,
             serverSelectionTimeoutMS=5000,  # fail fast; don't block startup
+            heartbeatFrequencyMS=8000,      # ping Atlas every 8 s to prevent
+                                            # M0 free-tier idle TCP disconnects
         )
         await client.admin.command("ping")
         _client = client

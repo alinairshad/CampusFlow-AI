@@ -1,7 +1,8 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.db.mongo import connect_db, close_db
@@ -51,6 +52,58 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     await close_db()
+
+
+# ---------------------------------------------------------------------------
+# Global exception handler — MongoDB not-initialised recovery
+# ---------------------------------------------------------------------------
+_DB_NOT_INIT_PREFIX = "Database not initialised"
+_logger = logging.getLogger(__name__)
+
+
+@app.exception_handler(RuntimeError)
+async def db_not_initialised_handler(request: Request, exc: RuntimeError) -> JSONResponse:
+    """
+    Catch the RuntimeError raised by get_database() when _client is None
+    (Atlas idle-timeout or startup failure).
+
+    Recovery path:
+      1. Attempt one reconnect via connect_db().
+      2. If reconnect succeeds → return 503 "please retry" so the client
+         retries without risk of double-insert from a re-run handler.
+      3. If reconnect also fails → return 503 "database temporarily unavailable".
+
+    Returning 503 (not silently retrying the original handler) is deliberately
+    conservative: the original handler may have partially executed before the
+    error, so re-running it could cause side effects (e.g. double-inserts).
+    """
+    if not str(exc).startswith(_DB_NOT_INIT_PREFIX):
+        # Not a DB initialisation error — let FastAPI handle it normally
+        raise exc
+
+    _logger.warning("DB not initialised on %s %s — attempting reconnect",
+                    request.method, request.url.path)
+
+    try:
+        await connect_db()
+        _logger.info("Reconnect succeeded — returning 503 so client can retry")
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": "Database reconnected after an idle timeout. "
+                          "Please retry your request."
+            },
+            headers={"Retry-After": "1"},
+        )
+    except Exception as reconnect_exc:
+        _logger.error("Reconnect failed: %s", reconnect_exc)
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": "Database is temporarily unavailable. Please try again shortly."
+            },
+            headers={"Retry-After": "5"},
+        )
 
 
 # ---------------------------------------------------------------------------
