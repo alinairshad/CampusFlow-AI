@@ -1,0 +1,23 @@
+# FastAPI Cloud upload exclusions.
+# Uses the same syntax as .gitignore.
+# Files listed here are excluded from the deployment upload even if not in .gitignore.
+
+# Virtual environment — never upload (FastAPI Cloud installs from requirements.txt)
+venv/
+
+# Local config created by the CLI on first deploy — not needed in the upload
+.fastapicloud/
+
+# Local secrets — already in .gitignore, listed here as an extra safety net
+.env
+.env.local
+
+# Test artefacts
+scripts/
+
+# Editor noise
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo

@@ -12,6 +12,7 @@ build/
 backend/venv/
 backend/.env
 backend/.env.local
+backend/.fastapicloud/
 *.sqlite3
 
 # ── Node / Frontend ───────────────────────────────────────────────────────────
