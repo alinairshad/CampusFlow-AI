@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from fastapi import FastAPI, Request
@@ -60,50 +61,67 @@ async def shutdown_event():
 _DB_NOT_INIT_PREFIX = "Database not initialised"
 _logger = logging.getLogger(__name__)
 
+# Lock prevents concurrent requests from all calling connect_db() simultaneously
+# during a cold-start window when _client is None.
+_reconnect_lock = asyncio.Lock()
+
 
 @app.exception_handler(RuntimeError)
 async def db_not_initialised_handler(request: Request, exc: RuntimeError) -> JSONResponse:
     """
     Catch the RuntimeError raised by get_database() when _client is None
-    (Atlas idle-timeout or startup failure).
+    (Atlas idle-timeout or cold-start race).
+
+    The asyncio.Lock ensures only ONE reconnect attempt runs at a time.
+    Concurrent requests that arrive while a reconnect is in progress wait
+    for it to finish, then return 503 "please retry" — they don't each
+    spawn a new Motor client.
 
     Recovery path:
-      1. Attempt one reconnect via connect_db().
-      2. If reconnect succeeds → return 503 "please retry" so the client
-         retries without risk of double-insert from a re-run handler.
-      3. If reconnect also fails → return 503 "database temporarily unavailable".
-
-    Returning 503 (not silently retrying the original handler) is deliberately
-    conservative: the original handler may have partially executed before the
-    error, so re-running it could cause side effects (e.g. double-inserts).
+      1. Acquire lock — other concurrent handlers queue behind this one.
+      2. Re-check _client inside the lock (it may have been set by a
+         concurrent handler that finished just before we acquired).
+      3. If still None, attempt connect_db() (which itself retries with backoff).
+      4. Return 503 "please retry" on success or failure — conservative
+         choice to avoid double-inserts from re-running the original handler.
     """
     if not str(exc).startswith(_DB_NOT_INIT_PREFIX):
-        # Not a DB initialisation error — let FastAPI handle it normally
         raise exc
 
-    _logger.warning("DB not initialised on %s %s — attempting reconnect",
+    _logger.warning("DB not initialised on %s %s — acquiring reconnect lock",
                     request.method, request.url.path)
 
-    try:
-        await connect_db()
-        _logger.info("Reconnect succeeded — returning 503 so client can retry")
-        return JSONResponse(
-            status_code=503,
-            content={
-                "detail": "Database reconnected after an idle timeout. "
-                          "Please retry your request."
-            },
-            headers={"Retry-After": "1"},
-        )
-    except Exception as reconnect_exc:
-        _logger.error("Reconnect failed: %s", reconnect_exc)
-        return JSONResponse(
-            status_code=503,
-            content={
-                "detail": "Database is temporarily unavailable. Please try again shortly."
-            },
-            headers={"Retry-After": "5"},
-        )
+    async with _reconnect_lock:
+        # Re-check inside the lock: a prior waiter may have already reconnected
+        from app.db.mongo import _client as current_client
+        if current_client is not None:
+            _logger.info("Reconnect already completed by concurrent handler — returning 503 retry")
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Database reconnected. Please retry your request."},
+                headers={"Retry-After": "1"},
+            )
+
+        try:
+            await connect_db()
+            _logger.info("Reconnect succeeded — returning 503 so client can retry")
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Database reconnected after an idle timeout. "
+                              "Please retry your request."
+                },
+                headers={"Retry-After": "1"},
+            )
+        except Exception as reconnect_exc:
+            _logger.error("Reconnect failed: %s", reconnect_exc)
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Database is temporarily unavailable. Please try again shortly."
+                },
+                headers={"Retry-After": "5"},
+            )
 
 
 # ---------------------------------------------------------------------------

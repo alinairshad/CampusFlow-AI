@@ -2,6 +2,7 @@
 MongoDB connection setup via Motor (async driver).
 connect_db() and close_db() are called from main.py lifecycle events.
 """
+import asyncio
 import logging
 
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -13,37 +14,58 @@ logger = logging.getLogger(__name__)
 
 _client: AsyncIOMotorClient | None = None
 
+# Total time connect_db() will spend retrying on cold start before giving up.
+# FastAPI Cloud routes traffic only after the startup event completes, so
+# blocking here for up to 15 s ensures Atlas is ready before the first request.
+_CONNECT_TOTAL_TIMEOUT = 15      # seconds
+_CONNECT_RETRY_DELAYS  = [1, 2, 4, 8]  # backoff gaps between attempts (cumulative ≤ 15 s)
+
 
 async def connect_db() -> None:
     """
-    Attempt to connect to MongoDB and verify with a ping.
+    Connect to MongoDB with a retry loop and exponential backoff.
 
-    Stage-0 safety net: if the connection fails (e.g. Atlas not yet
-    configured), log a warning and leave _client as None so the server
-    can still start.  All endpoints that call get_database() will raise
-    a RuntimeError until a real connection is established — that is the
-    correct behaviour for later stages.
+    Retries for up to ~15 seconds total before giving up and leaving
+    _client as None. This ensures the startup_event blocks long enough
+    for Atlas to become reachable on cold start (FastAPI Cloud scale-to-zero).
+
+    On development/local without a real Atlas URI the Stage-0 safety net
+    still applies: a warning is logged and the server continues without DB.
     """
     global _client
-    try:
-        client = AsyncIOMotorClient(
-            settings.MONGODB_URI,
-            serverSelectionTimeoutMS=5000,  # fail fast; don't block startup
-            heartbeatFrequencyMS=8000,      # ping Atlas every 8 s to prevent
-                                            # M0 free-tier idle TCP disconnects
-        )
-        await client.admin.command("ping")
-        _client = client
-        logger.info("MongoDB connection established.")
-        await _create_indexes(client[settings.DATABASE_NAME])
-    except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as exc:
-        _client = None
-        logger.warning(
-            "MongoDB not connected — set MONGODB_URI in .env once Atlas is set up. "
-            "(%s: %s)",
-            type(exc).__name__,
-            exc,
-        )
+    last_exc: Exception | None = None
+
+    for attempt, delay in enumerate([0] + _CONNECT_RETRY_DELAYS, start=1):
+        if delay:
+            logger.info("connect_db: retry %d/%d in %ds …",
+                        attempt, len(_CONNECT_RETRY_DELAYS) + 1, delay)
+            await asyncio.sleep(delay)
+
+        try:
+            client = AsyncIOMotorClient(
+                settings.MONGODB_URI,
+                serverSelectionTimeoutMS=5000,  # per-attempt timeout
+                heartbeatFrequencyMS=8000,      # keep M0 idle connections alive
+            )
+            await client.admin.command("ping")
+            _client = client
+            logger.info("MongoDB connection established (attempt %d).", attempt)
+            await _create_indexes(client[settings.DATABASE_NAME])
+            return  # success — exit the retry loop
+        except (ConnectionFailure, ServerSelectionTimeoutError, Exception) as exc:
+            last_exc = exc
+            logger.warning(
+                "connect_db attempt %d failed: %s: %s",
+                attempt, type(exc).__name__, exc,
+            )
+
+    # All retries exhausted
+    _client = None
+    logger.warning(
+        "MongoDB not connected after %d attempts — "
+        "set MONGODB_URI in .env once Atlas is set up. Last error: %s",
+        len(_CONNECT_RETRY_DELAYS) + 1, last_exc,
+    )
 
 
 async def _create_indexes(db) -> None:
