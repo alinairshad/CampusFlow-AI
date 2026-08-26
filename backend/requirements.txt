@@ -1,5 +1,10 @@
 # ── Web framework ──────────────────────────────────────────────────────────
-fastapi==0.111.0
+# fastapi[standard] is required by FastAPI Cloud: the platform starts the app
+# with `fastapi run`, which requires the CLI binary that comes with [standard].
+# Version 0.111.0 does not support [standard] — upgraded to 0.115.0 which
+# introduced the extra. API surface used by this project (routing, Depends,
+# HTTPException, middleware) is unchanged between 0.111 and 0.115.
+fastapi[standard]==0.115.0
 uvicorn[standard]==0.29.0
 
 # ── Database ────────────────────────────────────────────────────────────────
