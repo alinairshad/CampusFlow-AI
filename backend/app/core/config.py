@@ -26,8 +26,28 @@ class Settings(BaseSettings):
     # University (fixed for MVP single-university deployment)
     UNIVERSITY_ID: str = "university_mvp_001"
 
-    # CORS — comma-separated list loaded from env
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    # CORS — declared as str so pydantic-settings never tries to JSON-decode it.
+    # Accepts both formats from the environment:
+    #   plain : http://localhost:5173,https://app.vercel.app
+    #   JSON  : ["http://localhost:5173","https://app.vercel.app"]
+    # main.py reads settings.allowed_origins_list (a property) for the actual list.
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        """
+        Parse ALLOWED_ORIGINS into a list, accepting both:
+          - plain comma-separated: 'http://localhost:5173,https://app.vercel.app'
+          - JSON array:           '["http://localhost:5173","https://app.vercel.app"]'
+        """
+        import json
+        raw = self.ALLOWED_ORIGINS.strip()
+        if raw.startswith("["):
+            try:
+                return [str(o).strip() for o in json.loads(raw) if str(o).strip()]
+            except json.JSONDecodeError:
+                pass
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
     model_config = SettingsConfigDict(
         env_file=".env",
