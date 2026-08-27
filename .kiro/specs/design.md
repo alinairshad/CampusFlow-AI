@@ -198,6 +198,15 @@ _id, university_id, name, location, working_hours, contact,
 services[], category, updated_at
 ```
 
+**`societies`** (University Societies)
+```
+_id, university_id, name,
+category ("Tech"|"Sports"|"Literary"|"Arts"|"Social Welfare"|"Cultural"|"Other"),
+description, how_to_join, contact_email,
+social_media_link (optional), faculty_advisor (optional),
+updated_at
+```
+
 **`announcements`**
 ```
 _id, university_id, title, body, target_department, target_semester,
@@ -223,6 +232,8 @@ _id, university_id, student_id (ref), messages: [
 - `document_chunks.embedding` — Atlas Vector Search index
 - `document_chunks.university_id, category` — compound index for filtered retrieval
 - `departments_offices.name, services` — text index for keyword search fallback
+- `societies.name, description, category` — text index for keyword search
+- `societies.university_id` — for scoped list queries
 - `applications.student_id`, `conversations.student_id` — for dashboard queries
 
 ---
@@ -256,6 +267,13 @@ GET    /directory                     (student-facing list)
 GET    /directory/{id}
 GET    /directory/search?q=...
 
+POST   /admin/societies               (admin only)
+PUT    /admin/societies/{id}
+DELETE /admin/societies/{id}
+GET    /societies                     (student-facing list)
+GET    /societies/{id}
+GET    /societies/search?q=...
+
 POST   /assistant/query               (unified entrypoint — classify + route)
 GET    /assistant/conversations
 GET    /assistant/conversations/{id}
@@ -264,7 +282,7 @@ POST   /applications/generate
 GET    /applications
 GET    /applications/{id}/pdf
 
-GET    /search?q=...                  (cross knowledge base + directory)
+GET    /search?q=...                  (cross knowledge base + directory + societies)
 
 GET    /admin/stats                   (admin only — basic counts)
 ```

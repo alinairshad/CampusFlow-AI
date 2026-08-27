@@ -174,3 +174,20 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 5. WHEN data models are designed THEN every core collection SHALL include a `university_id` field to support future multi-university expansion without schema migration.
 6. WHEN the system is deployed THEN the frontend SHALL be hosted on Vercel and the backend on a free-tier platform (e.g., Render), both accessible via public URLs.
 7. WHEN LLM-generated content is produced (answers, action plans, applications) THEN the system SHALL never present fabricated university-specific facts (deadlines, fees, policies) that are not grounded in retrieved source documents.
+
+---
+
+## Requirement 12: University Societies
+
+**User Story:** As a student, I want to discover university societies — their purpose, how to join, and who to contact — so that I can find extracurricular activities that match my interests without needing to ask around.
+
+### Acceptance Criteria
+
+1. WHEN an admin creates a society entry THEN the system SHALL require name, category (Tech, Sports, Literary, Arts, Social Welfare, Cultural, or Other), description, how-to-join instructions, and contact email.
+2. WHEN an admin creates a society entry THEN the system SHALL optionally accept a social media link and faculty advisor name.
+3. WHEN a student views the Societies section THEN the system SHALL display all society entries in a browsable list, grouped or filterable by category.
+4. WHEN a student views a single society entry THEN the system SHALL display all its details (category, description, how to join, contact email, social media link if present, faculty advisor if present) in full.
+5. WHEN a student searches the societies list THEN the system SHALL support keyword search across society name, description, and category fields.
+6. WHEN an admin edits or removes a society entry THEN the changes SHALL be reflected immediately in student-facing views.
+7. WHEN society data is stored THEN the system SHALL associate each entry with a `university_id` so the schema supports future multi-university use without migration.
+8. WHEN a student views society contact information THEN the system SHALL display it as-is for direct outreach — there is no in-app join or registration flow; students contact the society directly.

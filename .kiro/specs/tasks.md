@@ -157,3 +157,18 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 11.3 Rehearse the 2–3 minute demo flow defined in the product analysis (login → problem query → action plan → generate application → PDF download → admin live upload → new source appears in citation)
 - [ ] 11.4 Write README covering setup, architecture summary, and how Kiro specs guided development
 - [ ] 11.5 Final Git history review — confirm commits are meaningful and map to the stages above, `.kiro/specs/` files present and unmodified post-generation
+
+---
+
+## Stage 12 — University Societies
+*Implements Requirement 12*
+
+- [ ] 12.1 Define `Society` Pydantic model and response shapes (`SocietyInDB`, `SocietyCreateRequest`, `SocietyUpdateRequest`, `SocietyResponse`, `SocietyListItem`, `SocietyListResponse`) following the `DepartmentOffice` model pattern from Stage 6
+- [ ] 12.2 Implement `POST/PUT/DELETE /admin/societies` endpoints (admin-only), extend `_create_indexes` in `mongo.py` to add text index on name/description/category and compound index on university_id
+- [ ] 12.3 Implement `GET /societies` (student-facing list, sorted by name) and `GET /societies/{id}` (full detail), both public/no-auth following the same pattern as `GET /directory`
+- [ ] 12.4 Implement `GET /societies/search?q=` — MongoDB `$text` search across name, description, and category fields; empty query returns empty list; route declared before `/{id}` to prevent path conflict
+- [ ] 12.5 Test CRUD, search, and access control with sample society data (at least one entry per category)
+- [ ] 12.6 Frontend: build Admin societies management UI (`SocietyManager.jsx`) — create/edit form with all fields (name, category dropdown from enum, description, how-to-join, contact email, optional social media link and faculty advisor), entry list with edit/delete buttons, mounted as a third section in `AdminDashboardPlaceholder.jsx` following the `DirectoryManager` pattern
+- [ ] 12.7 Frontend: build student-facing Societies browse page (`SocietiesPage.jsx`) — debounced search bar, category filter chips, entry cards (name, category badge, one-line description preview), click-through to full detail view; add `/societies` route to `App.jsx` (student ProtectedRoute) and a "Societies" card to `StudentDashboardPlaceholder.jsx`
+- [ ] 12.8 Test full flow: admin creates societies → student browses and searches → student views full detail including optional fields (social media, faculty advisor) and contact info
+- [ ] 12.9 Extend `GET /search` to include societies as a third result section (`society_results`) alongside `document_results` and `directory_results` — `$text` search over societies collection, same university_id scoping, returns `{id, name, category, description_preview}` per hit; update the "no results" message to cover all three sections
