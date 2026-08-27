@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ChatPage — AI Campus Assistant chat interface.
  *
  * Layout:
@@ -27,14 +27,14 @@ import ActionPlanCard from './ActionPlanCard'
 function TypingIndicator() {
   return (
     <div className="flex items-end gap-2 mb-4">
-      <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-        <span className="text-indigo-500 text-xs font-bold">AI</span>
+      <div className="w-7 h-7 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
+        <span className="text-lgu-600 text-xs font-bold">AI</span>
       </div>
       <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
         <span className="flex gap-1 items-center h-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+          <span className="w-1.5 h-1.5 rounded-full bg-lgu-400 animate-bounce [animation-delay:-0.3s]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-lgu-400 animate-bounce [animation-delay:-0.15s]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-lgu-400 animate-bounce" />
         </span>
       </div>
     </div>
@@ -44,7 +44,7 @@ function TypingIndicator() {
 function UserBubble({ content }) {
   return (
     <div className="flex justify-end mb-4">
-      <div className="max-w-[90%] sm:max-w-[75%] bg-indigo-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 shadow-sm">
+      <div className="max-w-[90%] sm:max-w-[75%] bg-lgu-700 text-white rounded-2xl rounded-br-sm px-4 py-2.5 shadow-sm">
         <p className="text-sm whitespace-pre-wrap leading-relaxed">{content}</p>
       </div>
     </div>
@@ -57,8 +57,8 @@ function AssistantBubble({ content, type, sources, found, actionPlan, conversati
   return (
     <div className="flex items-end gap-2 mb-4">
       {/* Avatar */}
-      <div className="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 mb-0.5">
-        <span className="text-indigo-500 text-xs font-bold">AI</span>
+      <div className="w-7 h-7 rounded-full bg-lgu-100 flex items-center justify-center shrink-0 mb-0.5">
+        <span className="text-lgu-600 text-xs font-bold">AI</span>
       </div>
 
       <div className="max-w-[92%] sm:max-w-[78%] space-y-1.5">
@@ -189,8 +189,8 @@ export default function ChatPage() {
       {/* ── Top nav ─────────────────────────────────────────────────────── */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-base font-bold text-indigo-600">CampusFlow AI</span>
-          <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" /><span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
+          <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
             Assistant
           </span>
         </div>
@@ -207,8 +207,8 @@ export default function ChatPage() {
         {/* Welcome message if no messages yet */}
         {messages.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
-              <span className="text-indigo-500 text-xl font-bold">AI</span>
+            <div className="w-14 h-14 rounded-full bg-lgu-100 flex items-center justify-center mb-4">
+              <span className="text-lgu-600 text-xl font-bold">AI</span>
             </div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">
               How can I help you today?
@@ -264,7 +264,7 @@ export default function ChatPage() {
             placeholder="Ask a question…"
             rows={1}
             className="flex-1 min-w-0 resize-none border border-gray-300 rounded-xl px-3 py-2.5 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-indigo-400
+                       focus:outline-none focus:ring-2 focus:ring-lgu-400
                        disabled:opacity-50 leading-relaxed max-h-40 overflow-y-auto"
             style={{ minHeight: '42px' }}
             onInput={(e) => {
@@ -277,7 +277,7 @@ export default function ChatPage() {
             onClick={handleSend}
             disabled={loading || !input.trim()}
             aria-label="Send message"
-            className="shrink-0 w-10 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700
+            className="shrink-0 w-10 h-10 rounded-xl bg-lgu-700 hover:bg-lgu-800
                        disabled:opacity-40 flex items-center justify-center transition-colors"
           >
             {loading ? (

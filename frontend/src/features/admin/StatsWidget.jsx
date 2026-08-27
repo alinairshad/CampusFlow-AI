@@ -1,4 +1,4 @@
-/**
+﻿/**
  * StatsWidget — 2×2 grid of stat cards for the admin dashboard.
  *
  * Props:
@@ -79,7 +79,7 @@ const STAT_CARDS = [
     key:    'total_documents',
     label:  'Documents indexed',
     icon:   DocIcon,
-    colour: 'bg-indigo-100 text-indigo-600',
+    colour: 'bg-lgu-100 text-lgu-700',
   },
   {
     key:    'total_students',

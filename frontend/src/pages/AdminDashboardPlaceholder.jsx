@@ -40,8 +40,9 @@ export default function AdminDashboardPlaceholder() {
       {/* Top nav */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-bold text-indigo-600">CampusFlow AI</span>
-          <span className="text-xs bg-indigo-100 text-indigo-700 font-medium px-2 py-0.5 rounded-full">
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" />
+          <span className="text-lg font-bold text-lgu-700">LGU AI Assistant</span>
+          <span className="text-xs bg-lgu-100 text-lgu-700 font-medium px-2 py-0.5 rounded-full">
             Admin
           </span>
         </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DocumentUploadForm — file picker, category dropdown, optional title,
  * upload progress bar, and inline error/success feedback.
  *
@@ -112,7 +112,7 @@ export default function DocumentUploadForm({ token, onUploaded }) {
             required
             className="block w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-4
                        file:rounded-lg file:border-0 file:text-sm file:font-medium
-                       file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100
+                       file:bg-lgu-50 file:text-lgu-700 hover:file:bg-lgu-100
                        cursor-pointer"
           />
           {file && (
@@ -132,7 +132,7 @@ export default function DocumentUploadForm({ token, onUploaded }) {
             onChange={(e) => setCategory(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                       focus:outline-none focus:ring-2 focus:ring-lgu-400 bg-white"
           >
             <option value="">Select a category…</option>
             {CATEGORIES.map((c) => (
@@ -152,7 +152,7 @@ export default function DocumentUploadForm({ token, onUploaded }) {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Fee Structure 2024"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                       focus:outline-none focus:ring-2 focus:ring-lgu-400"
           />
         </div>
 
@@ -165,7 +165,7 @@ export default function DocumentUploadForm({ token, onUploaded }) {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1.5">
               <div
-                className="bg-indigo-500 h-1.5 rounded-full transition-all duration-200"
+                className="bg-lgu-500 h-1.5 rounded-full transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -189,7 +189,7 @@ export default function DocumentUploadForm({ token, onUploaded }) {
         <button
           type="submit"
           disabled={uploading || !file || !category}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40
+          className="w-full bg-lgu-700 hover:bg-lgu-800 disabled:opacity-40
                      text-white font-medium rounded-lg py-2 text-sm transition-colors"
         >
           {uploading ? 'Uploading…' : 'Upload document'}

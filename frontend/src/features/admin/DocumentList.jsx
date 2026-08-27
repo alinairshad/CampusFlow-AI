@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DocumentList — renders the knowledge-base document library with
  * a delete button per row. Calls onDeleted after successful deletion
  * so the parent can refresh.
@@ -103,8 +103,8 @@ export default function DocumentList({ documents, token, loading, onDeleted }) {
           {documents.map((doc) => (
             <li key={doc.id} className="px-4 sm:px-6 py-4 flex items-start gap-3">
               {/* File type icon */}
-              <div className="mt-0.5 shrink-0 w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <span className="text-xs font-bold text-indigo-500 uppercase">
+              <div className="mt-0.5 shrink-0 w-8 h-8 rounded-lg bg-lgu-50 flex items-center justify-center">
+                <span className="text-xs font-bold text-lgu-600 uppercase">
                   {doc.filename.split('.').pop()}
                 </span>
               </div>

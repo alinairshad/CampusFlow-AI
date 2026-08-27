@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ApplicationPage — AI Application Generator.
  *
  * States:
@@ -109,7 +109,7 @@ function GeneratedApplication({ appId, bodyText, onBodyChange, onDownload, downl
         onChange={(e) => onBodyChange(e.target.value)}
         rows={14}
         className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-indigo-400
+                   focus:outline-none focus:ring-2 focus:ring-lgu-400
                    leading-relaxed resize-y font-[system-ui]"
         aria-label="Application body text — edit as needed"
       />
@@ -147,7 +147,7 @@ function GeneratedApplication({ appId, bodyText, onBodyChange, onDownload, downl
           onClick={onDownload}
           disabled={downloading}
           className="flex-1 flex items-center justify-center gap-2
-                     bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50
+                     bg-lgu-700 hover:bg-lgu-800 disabled:opacity-50
                      text-white text-sm font-medium rounded-xl py-2.5 transition-colors"
         >
           {downloading ? (
@@ -290,8 +290,8 @@ export default function ApplicationPage() {
                 clipRule="evenodd" />
             </svg>
           </Link>
-          <span className="text-base font-bold text-indigo-600">CampusFlow AI</span>
-          <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" /><span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
+          <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
             Application Generator
           </span>
         </div>
@@ -319,7 +319,7 @@ export default function ApplicationPage() {
                   value={appType}
                   onChange={(e) => { setAppType(e.target.value); setError('') }}
                   className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm
-                             focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                             focus:outline-none focus:ring-2 focus:ring-lgu-400 bg-white"
                 >
                   <option value="">Select a type…</option>
                   {APPLICATION_TYPES.map(({ value, label }) => (
@@ -343,7 +343,7 @@ export default function ApplicationPage() {
                   placeholder="Briefly describe your situation (e.g., medical emergency with documentation)…"
                   rows={4}
                   className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm
-                             focus:outline-none focus:ring-2 focus:ring-indigo-400
+                             focus:outline-none focus:ring-2 focus:ring-lgu-400
                              leading-relaxed resize-none"
                 />
               </div>
@@ -357,7 +357,7 @@ export default function ApplicationPage() {
               <button
                 onClick={() => handleGenerate()}
                 disabled={!appType}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40
+                className="w-full bg-lgu-700 hover:bg-lgu-800 disabled:opacity-40
                            text-white font-medium text-sm rounded-xl py-2.5 transition-colors"
               >
                 Generate application
@@ -368,7 +368,7 @@ export default function ApplicationPage() {
           {/* ── Loading ───────────────────────────────────────────────────── */}
           {phase === 'loading' && (
             <div className="flex flex-col items-center py-10 gap-3">
-              <svg className="animate-spin w-8 h-8 text-indigo-500"
+              <svg className="animate-spin w-8 h-8 text-lgu-600"
                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10"
                         stroke="currentColor" strokeWidth="4" />

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ActionPlanCard — rendered inside AssistantBubble when type === "problem".
  *
  * Props:
@@ -48,10 +48,10 @@ function DepartmentBadge({ department }) {
   return (
     <div className="flex items-start gap-2 mb-3">
       <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center
-                       ${isUnspecified ? 'bg-gray-100' : 'bg-indigo-100'}`}>
+                       ${isUnspecified ? 'bg-gray-100' : 'bg-lgu-100'}`}>
         {/* Building icon */}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-             className={`w-4 h-4 ${isUnspecified ? 'text-gray-400' : 'text-indigo-600'}`}>
+             className={`w-4 h-4 ${isUnspecified ? 'text-gray-400' : 'text-lgu-700'}`}>
           <path fillRule="evenodd"
             d="M1 2.5A1.5 1.5 0 0 1 2.5 1h7A1.5 1.5 0 0 1 11 2.5v5.5h1.5A1.5 1.5 0 0 1 14 9.5V14h.5a.5.5 0 0 1 0 1H1.5a.5.5 0 0 1 0-1H2V2.5ZM3 14h2v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V14h2V2.5a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5V14Zm5 0v-2H8v2h0Z"
             clipRule="evenodd" />
@@ -100,7 +100,7 @@ function StepList({ steps }) {
       <ol className="space-y-2">
         {validSteps.map((step, i) => (
           <li key={i} className="flex items-start gap-2.5">
-            <span className="shrink-0 w-5 h-5 rounded-full bg-indigo-100 text-indigo-700
+            <span className="shrink-0 w-5 h-5 rounded-full bg-lgu-100 text-lgu-700
                              text-xs font-bold flex items-center justify-center mt-0.5">
               {i + 1}
             </span>
@@ -118,16 +118,16 @@ function NextActionBox({ nextAction }) {
   if (isUnspecified) return null
 
   return (
-    <div className="flex items-start gap-2.5 bg-indigo-50 border border-indigo-200
+    <div className="flex items-start gap-2.5 bg-lgu-50 border border-lgu-200
                     rounded-xl px-3.5 py-3 mb-3">
       {/* Lightning bolt icon */}
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-           className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5">
+           className="w-4 h-4 text-lgu-700 shrink-0 mt-0.5">
         <path d="M7.462 2.062a.75.75 0 0 1 .576.68V7.25h3.516a.75.75 0 0 1 .57 1.237l-5.25 6a.75.75 0 0 1-1.353-.487V9.25H2.006a.75.75 0 0 1-.57-1.238l5.25-6a.75.75 0 0 1 .776-.95Z" />
       </svg>
       <div>
-        <p className="text-xs font-semibold text-indigo-700 mb-0.5">Do this first</p>
-        <p className="text-sm text-indigo-900 font-medium leading-snug">{nextAction}</p>
+        <p className="text-xs font-semibold text-lgu-700 mb-0.5">Do this first</p>
+        <p className="text-sm text-lgu-900 font-medium leading-snug">{nextAction}</p>
       </div>
     </div>
   )
@@ -138,7 +138,7 @@ function GenerateApplicationButton({ onClick }) {
     <button
       onClick={onClick}
       className="w-full flex items-center justify-center gap-2 text-sm font-medium
-                 bg-indigo-600 hover:bg-indigo-700 text-white
+                 bg-lgu-700 hover:bg-lgu-800 text-white
                  rounded-xl py-2.5 transition-colors"
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"

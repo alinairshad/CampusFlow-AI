@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/* LGU (Lahore Garrison University) brand green scale.
+   #1B5E20 is the primary brand color, mapped to lgu-700 (buttons/links/active nav).
+   Lighter shades are used for backgrounds, badges, and focus rings. */
+@theme {
+  --color-lgu-50:  #F1F8F2;
+  --color-lgu-100: #E8F5E9;
+  --color-lgu-200: #C8E6CA;
+  --color-lgu-300: #A5D6A7;
+  --color-lgu-400: #6DB870;
+  --color-lgu-500: #4CAF52;
+  --color-lgu-600: #338A38;
+  --color-lgu-700: #1B5E20;
+  --color-lgu-800: #144D18;
+  --color-lgu-900: #0D3510;
+}

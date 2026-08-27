@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DirectoryManager — admin UI for creating, editing, and deleting
  * university directory entries (departments/offices).
  *
@@ -70,7 +70,7 @@ function EntryForm({ initial, onSubmit, onCancel, saving }) {
   }
 
   const inputCls = `w-full border border-gray-300 rounded-xl px-3 py-2 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-indigo-400`
+                    focus:outline-none focus:ring-2 focus:ring-lgu-400`
 
   return (
     <form onSubmit={submit} className="space-y-3">
@@ -138,7 +138,7 @@ function EntryForm({ initial, onSubmit, onCancel, saving }) {
 
       <div className="flex gap-2 pt-1">
         <button type="submit" disabled={saving}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50
+                className="flex-1 bg-lgu-700 hover:bg-lgu-800 disabled:opacity-50
                            text-white text-sm font-medium rounded-xl py-2 transition-colors">
           {saving ? 'Saving…' : 'Save entry'}
         </button>
@@ -162,7 +162,7 @@ function EntryRow({ entry, onEdit, onDelete, deleting }) {
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-sm font-semibold text-gray-800">{entry.name}</p>
           {entry.category && (
-            <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full">
               {entry.category}
             </span>
           )}
@@ -173,7 +173,7 @@ function EntryRow({ entry, onEdit, onDelete, deleting }) {
       <div className="flex gap-1.5 shrink-0 mt-0.5">
         <button onClick={() => onEdit(entry)}
                 className="text-xs px-2.5 py-1 border border-gray-300 rounded-lg
-                           text-gray-600 hover:border-indigo-400 hover:text-indigo-600 transition-colors">
+                           text-gray-600 hover:border-lgu-400 hover:text-lgu-700 transition-colors">
           Edit
         </button>
         <button onClick={() => onDelete(entry)} disabled={deleting === entry.id}
@@ -290,7 +290,7 @@ export default function DirectoryManager({ token }) {
         </div>
         {formData === null && (
           <button onClick={openCreate}
-                  className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white
+                  className="text-sm bg-lgu-700 hover:bg-lgu-800 text-white
                              font-medium rounded-xl px-4 py-1.5 transition-colors">
             + Add entry
           </button>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DirectoryPage — student-facing university directory.
  *
  * States:
@@ -30,7 +30,7 @@ const CAT_COLOURS = {
 }
 function CategoryBadge({ category }) {
   if (!category) return null
-  const cls = CAT_COLOURS[category] || 'bg-indigo-50 text-indigo-700'
+  const cls = CAT_COLOURS[category] || 'bg-lgu-50 text-lgu-700'
   return (
     <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${cls}`}>
       {category}
@@ -46,14 +46,14 @@ function EntryCard({ entry, onClick }) {
     <button
       onClick={() => onClick(entry.id)}
       className="w-full text-left bg-white rounded-2xl border border-gray-200
-                 shadow-sm hover:border-indigo-300 hover:shadow-md
+                 shadow-sm hover:border-lgu-300 hover:shadow-md
                  transition-all p-5 flex items-start gap-4"
     >
       {/* Icon */}
-      <div className="shrink-0 w-10 h-10 rounded-xl bg-indigo-100
+      <div className="shrink-0 w-10 h-10 rounded-xl bg-lgu-100
                       flex items-center justify-center mt-0.5">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-             className="w-5 h-5 text-indigo-600">
+             className="w-5 h-5 text-lgu-700">
           <path fillRule="evenodd"
             d="M1 2.5A1.5 1.5 0 0 1 2.5 1h7A1.5 1.5 0 0 1 11 2.5v5.5h1.5A1.5 1.5 0 0 1 14 9.5V14h.5a.5.5 0 0 1 0 1H1.5a.5.5 0 0 1 0-1H2V2.5ZM3 14h2v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V14h2V2.5a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5V14Zm5 0v-2H8v2h0Z"
             clipRule="evenodd" />
@@ -68,7 +68,7 @@ function EntryCard({ entry, onClick }) {
         </div>
         <p className="text-xs text-gray-500 truncate">{entry.location}</p>
         <p className="text-xs text-gray-400 mt-0.5">{entry.working_hours}</p>
-        <p className="text-xs text-indigo-600 mt-1 truncate">{entry.service_summary}</p>
+        <p className="text-xs text-lgu-700 mt-1 truncate">{entry.service_summary}</p>
       </div>
 
       {/* Arrow */}
@@ -90,7 +90,7 @@ function EntryDetail({ entry, onBack }) {
     <div className="space-y-5">
       <button onClick={onBack}
               className="flex items-center gap-1.5 text-sm text-gray-500
-                         hover:text-indigo-600 transition-colors">
+                         hover:text-lgu-700 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
              className="w-4 h-4">
           <path fillRule="evenodd"
@@ -103,10 +103,10 @@ function EntryDetail({ entry, onBack }) {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-5">
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-indigo-100
+          <div className="shrink-0 w-12 h-12 rounded-xl bg-lgu-100
                           flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
-                 className="w-6 h-6 text-indigo-600">
+                 className="w-6 h-6 text-lgu-700">
               <path fillRule="evenodd"
                 d="M1 2.5A1.5 1.5 0 0 1 2.5 1h7A1.5 1.5 0 0 1 11 2.5v5.5h1.5A1.5 1.5 0 0 1 14 9.5V14h.5a.5.5 0 0 1 0 1H1.5a.5.5 0 0 1 0-1H2V2.5ZM3 14h2v-2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V14h2V2.5a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5V14Zm5 0v-2H8v2h0Z"
                 clipRule="evenodd" />
@@ -140,7 +140,7 @@ function EntryDetail({ entry, onBack }) {
           <div className="flex flex-wrap gap-1.5">
             {(entry.services || []).map((svc, i) => (
               <span key={i}
-                    className="inline-block text-xs bg-indigo-50 text-indigo-700
+                    className="inline-block text-xs bg-lgu-50 text-lgu-700
                                px-2.5 py-0.5 rounded-full">
                 {svc}
               </span>
@@ -257,8 +257,8 @@ export default function DirectoryPage() {
                 clipRule="evenodd" />
             </svg>
           </Link>
-          <span className="text-base font-bold text-indigo-600">CampusFlow AI</span>
-          <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" /><span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
+          <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
             Directory
           </span>
         </div>
@@ -292,10 +292,10 @@ export default function DirectoryPage() {
                 onChange={(e) => setSearchQ(e.target.value)}
                 placeholder="Search by name, service, or description…"
                 className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm
-                           focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white"
+                           focus:outline-none focus:ring-2 focus:ring-lgu-400 bg-white"
               />
               {searching && (
-                <svg className="animate-spin w-4 h-4 text-indigo-400 absolute right-3 top-1/2 -translate-y-1/2"
+                <svg className="animate-spin w-4 h-4 text-lgu-400 absolute right-3 top-1/2 -translate-y-1/2"
                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10"
                           stroke="currentColor" strokeWidth="4" />
