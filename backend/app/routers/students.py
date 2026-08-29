@@ -55,6 +55,7 @@ def _build_profile_response(user: dict, profile: dict) -> StudentProfileResponse
         semester=profile["semester"],
         batch=profile["batch"],
         interests=profile.get("interests", []),
+        is_mentor=profile.get("is_mentor", False),
     )
 
 
@@ -95,6 +96,10 @@ async def update_me(
         val = getattr(body, field, None)
         if val is not None:
             updates[field] = val
+
+    # is_mentor is a boolean toggle — must check explicitly for None, not just falsiness
+    if body.is_mentor is not None:
+        updates["is_mentor"] = body.is_mentor
 
     if updates:
         await db["student_profiles"].update_one(
