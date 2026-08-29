@@ -38,6 +38,7 @@ class StudentProfileInDB(BaseModel):
     semester: str
     batch: str
     interests: list[str] = []
+    is_mentor: bool = False            # student opts in to mentor directory (req 13.1)
     created_at: datetime
 
     model_config = {"populate_by_name": True}
@@ -88,6 +89,7 @@ class StudentProfileUpdateRequest(BaseModel):
     semester: Optional[str] = None
     batch: Optional[str] = None
     interests: Optional[list[str]] = None
+    is_mentor: Optional[bool] = None   # toggle mentor availability (req 13.1)
 
     @field_validator("name")
     @classmethod
@@ -126,6 +128,7 @@ class StudentProfileResponse(BaseModel):
     semester: str
     batch: str
     interests: list[str] = []
+    is_mentor: bool = False            # whether this student is in the mentor directory
 
 
 class DashboardApplicationItem(BaseModel):
