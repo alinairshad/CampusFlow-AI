@@ -6,6 +6,7 @@ import { useAuth } from '../auth/AuthContext'
 import DocumentUploadForm from '../features/admin/DocumentUploadForm'
 import DocumentList from '../features/admin/DocumentList'
 import DirectoryManager from '../features/admin/DirectoryManager'
+import SocietyManager from '../features/admin/SocietyManager'
 import StatsWidget from '../features/admin/StatsWidget'
 import { listDocuments } from '../api/documents'
 
@@ -107,6 +108,14 @@ export default function AdminDashboardPlaceholder() {
             University Directory
           </h2>
           <DirectoryManager token={token} />
+        </div>
+
+        {/* ── University Societies ──────────────────────────────────────── */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            University Societies
+          </h2>
+          <SocietyManager token={token} />
         </div>
       </main>
     </div>
