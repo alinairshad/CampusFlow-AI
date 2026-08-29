@@ -127,6 +127,21 @@ async def _create_indexes(db) -> None:
         default_language="english",
     )
 
+    # student_profiles — compound index for scoped mentor list queries (req 13.2)
+    # Allows efficient: {is_mentor: true, university_id: <uid>} queries sorted by name
+    await db["student_profiles"].create_index(
+        [("is_mentor", 1), ("university_id", 1), ("name", 1)],
+        name="student_profiles_mentor_university_name",
+    )
+
+    # student_profiles — text index for mentor keyword search (req 13.2)
+    # Covers name and interests[] fields; department filter uses the B-tree above
+    await db["student_profiles"].create_index(
+        [("name", "text"), ("interests", "text")],
+        name="student_profiles_mentor_text",
+        default_language="english",
+    )
+
     logger.info("Database indexes ensured.")
 
 
