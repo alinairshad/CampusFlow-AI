@@ -12,6 +12,7 @@ from app.routers import (
     students,
     admin_documents,
     admin_directory,
+    admin_societies,
     admin_stats,
     directory,
     assistant,
@@ -131,6 +132,7 @@ app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(students.router, prefix="/students", tags=["students"])
 app.include_router(admin_documents.router, prefix="/admin/documents", tags=["admin-documents"])
 app.include_router(admin_directory.router, prefix="/admin/directory", tags=["admin-directory"])
+app.include_router(admin_societies.router, prefix="/admin/societies", tags=["admin-societies"])
 app.include_router(admin_stats.router, prefix="/admin/stats", tags=["admin-stats"])
 app.include_router(directory.router, prefix="/directory", tags=["directory"])
 app.include_router(assistant.router, prefix="/assistant", tags=["assistant"])

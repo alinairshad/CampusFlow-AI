@@ -114,6 +114,19 @@ async def _create_indexes(db) -> None:
         default_language="english",
     )
 
+    # societies — compound index for university-scoped listing + sorting (req 12.2)
+    await db["societies"].create_index(
+        [("university_id", 1), ("name", 1)],
+        name="societies_university_name",
+    )
+
+    # societies — text index for keyword search across name, description, category
+    await db["societies"].create_index(
+        [("name", "text"), ("description", "text"), ("category", "text")],
+        name="societies_text",
+        default_language="english",
+    )
+
     logger.info("Database indexes ensured.")
 
 
