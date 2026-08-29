@@ -163,6 +163,25 @@ export default function StudentDashboardPlaceholder() {
                 </Link>
               ))}
             </div>
+            {/* Societies card — full width below the 3-col grid */}
+            <Link to="/societies"
+                  className="bg-white rounded-2xl border border-gray-200 p-4
+                             flex items-center gap-4
+                             hover:border-lgu-300 hover:shadow-sm transition-all">
+              <div className="w-10 h-10 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
+                <span className="text-lgu-700 text-sm font-bold">🎓</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Societies</p>
+                <p className="text-xs text-gray-400 mt-0.5">Clubs, sports, arts & more</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                   className="w-4 h-4 text-gray-400 ml-auto shrink-0">
+                <path fillRule="evenodd"
+                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                  clipRule="evenodd" />
+              </svg>
+            </Link>
             <RecentApplications applications={dashboard.recent_applications} />
             <RecentConversations conversations={dashboard.recent_conversations} />
           </>

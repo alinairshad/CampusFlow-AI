@@ -10,6 +10,7 @@ import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
 import ChatPage from './features/assistant/ChatPage'
 import ApplicationPage from './features/applications/ApplicationPage'
 import DirectoryPage from './features/directory/DirectoryPage'
+import SocietiesPage from './features/directory/SocietiesPage'
 
 export default function App() {
   return (
@@ -52,6 +53,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <DirectoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/societies"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <SocietiesPage />
               </ProtectedRoute>
             }
           />
