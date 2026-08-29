@@ -15,6 +15,7 @@ from app.routers import (
     admin_societies,
     admin_stats,
     directory,
+    societies,
     assistant,
     applications,
     search,
@@ -135,6 +136,7 @@ app.include_router(admin_directory.router, prefix="/admin/directory", tags=["adm
 app.include_router(admin_societies.router, prefix="/admin/societies", tags=["admin-societies"])
 app.include_router(admin_stats.router, prefix="/admin/stats", tags=["admin-stats"])
 app.include_router(directory.router, prefix="/directory", tags=["directory"])
+app.include_router(societies.router, prefix="/societies", tags=["societies"])
 app.include_router(assistant.router, prefix="/assistant", tags=["assistant"])
 app.include_router(applications.router, prefix="/applications", tags=["applications"])
 app.include_router(search.router, prefix="/search", tags=["search"])
