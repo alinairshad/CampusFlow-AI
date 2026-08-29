@@ -12,6 +12,7 @@ only for authentication, not for a specific role.
 Data source: student_profiles + users collections — no new collection.
 """
 import logging
+import re
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, Query
@@ -128,7 +129,53 @@ async def search_mentors(
     department: str = Query(default="", max_length=100, description="Exact department filter"),
     current_user: CurrentUser = Depends(get_current_user),
 ):
-    """Keyword search + optional department filter. Implemented in Task 13.4."""
-    # Stub — Task 13.4 will implement the $text search logic here.
-    # Returning empty list for now so the route is registered and auth-gated.
-    return MentorListResponse(mentors=[], total=0)
+    """
+    Search mentors by keyword (name/interests) and/or exact department.
+
+    Behaviour:
+      - q and department both empty → returns all mentors (same as GET /)
+      - q only                      → $text search, all departments
+      - department only             → all mentors in that department
+      - q + department              → $text search within that department
+      - empty q matches all mentors in the given department (no $text needed)
+
+    Auth: requires valid JWT (any authenticated user).
+    """
+    db = get_database()
+
+    q_stripped   = q.strip()
+    dept_stripped = department.strip()
+
+    # Build the filter — always scope to is_mentor=True + university_id
+    filter_doc: dict = {
+        "is_mentor": True,
+        "university_id": settings.UNIVERSITY_ID,
+    }
+
+    if dept_stripped:
+        # Exact case-insensitive match using a case-insensitive regex
+        filter_doc["department"] = re.compile(
+            f"^{re.escape(dept_stripped)}$", re.IGNORECASE
+        )
+
+    if q_stripped:
+        # Add $text search predicate
+        filter_doc["$text"] = {"$search": q_stripped}
+        # Sort by text relevance when searching, then name as tiebreaker
+        cursor = db[COLLECTION].find(
+            filter_doc,
+            {"score": {"$meta": "textScore"}},
+            sort=[("score", {"$meta": "textScore"}), ("name", 1)],
+        )
+    else:
+        # No keyword — sort by name only
+        cursor = db[COLLECTION].find(filter_doc, sort=[("name", 1)])
+
+    docs = await cursor.to_list(length=200)
+    items = await _profiles_to_mentors(docs, db)
+
+    logger.info(
+        "Mentor search: q=%r  dept=%r  results=%d  requester=%s",
+        q_stripped[:40], dept_stripped, len(items), current_user.user_id,
+    )
+    return MentorListResponse(mentors=items, total=len(items))
