@@ -191,3 +191,21 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 6. WHEN an admin edits or removes a society entry THEN the changes SHALL be reflected immediately in student-facing views.
 7. WHEN society data is stored THEN the system SHALL associate each entry with a `university_id` so the schema supports future multi-university use without migration.
 8. WHEN a student views society contact information THEN the system SHALL display it as-is for direct outreach — there is no in-app join or registration flow; students contact the society directly.
+
+---
+
+## Requirement 13: Senior-Junior Mentorship Directory
+
+**User Story:** As a junior student, I want to find senior students who are available as mentors so that I can reach out to someone experienced in my department or area of interest for peer guidance.
+
+### Acceptance Criteria
+
+1. WHEN a student views their profile THEN the system SHALL display a toggle indicating whether they are available as a mentor, defaulting to off.
+2. WHEN a student enables their mentor availability THEN the system SHALL update their profile immediately with no additional verification step required — the student's registered university account serves as their identity verification.
+3. WHEN a student disables their mentor availability THEN they SHALL no longer appear in mentor listings immediately.
+4. WHEN a student browses the Mentors section THEN the system SHALL display all students who have enabled mentor availability, showing name, department, semester, batch, interests, and contact email.
+5. WHEN a student searches the Mentors section THEN the system SHALL support filtering by department and keyword search across name and interests fields.
+6. WHEN a student views a mentor's listing THEN the system SHALL display the mentor's contact email for direct outreach — there is no in-app messaging or matching flow; the browsing student contacts the mentor directly.
+7. WHEN mentor data is displayed THEN the system SHALL pull it from existing `student_profiles` and `users` data — no new collection is required.
+8. WHEN the system displays mentor listings THEN it SHALL scope the results by `university_id` so students only see mentors from their own university.
+9. WHEN an unauthenticated request is made to the mentor listing or search endpoints THEN the system SHALL reject the request with 401 Unauthorized — mentor listings are student-auth-required (not public) to protect student contact information from being freely crawled.

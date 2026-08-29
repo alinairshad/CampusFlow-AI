@@ -177,7 +177,7 @@ created_at
 **`student_profiles`**
 ```
 _id, user_id (ref), university_id, name, department, semester, batch,
-interests[], created_at
+interests[], is_mentor (boolean, default false), created_at
 ```
 
 **`documents`**
@@ -235,6 +235,8 @@ _id, university_id, student_id (ref), messages: [
 - `societies.name, description, category` — text index for keyword search
 - `societies.university_id` — for scoped list queries
 - `applications.student_id`, `conversations.student_id` — for dashboard queries
+- `student_profiles.is_mentor, university_id` — compound index for scoped mentor list queries
+- `student_profiles.name, interests` — text index for mentor keyword search (department filter via standard B-tree on `department` field)
 
 ---
 
@@ -284,6 +286,9 @@ GET    /applications/{id}/pdf
 
 GET    /search?q=...                  (cross knowledge base + directory + societies)
 
+GET    /mentors                       (student-auth required — is_mentor=true listing)
+GET    /mentors/search?q=&department= (student-auth required — keyword + dept filter)
+
 GET    /admin/stats                   (admin only — basic counts)
 ```
 
@@ -332,5 +337,5 @@ GET    /admin/stats                   (admin only — basic counts)
 
 - **Multi-university:** every collection already keyed by `university_id`; a university-switcher would only require a new `universities` collection and a selector in the auth/registration flow.
 - **Interactive campus map:** `departments_offices` can later add optional `latitude`/`longitude` fields without breaking existing records.
-- **Senior-Junior Knowledge Sharing:** would be added as new collections (`questions`, `answers`) plus a `verified_senior` boolean on `student_profiles` — intentionally excluded from MVP but does not conflict with current schema.
+- **Senior-Junior Mentorship:** implemented via an `is_mentor` boolean on `student_profiles` (default false) — students self-opt-in via `PUT /students/me`, existing `student_profiles` + `users` data surfaces as mentor listings via `/mentors` endpoints, no new collection required. Mentor data is **intentionally excluded from `GET /search`** to avoid PII (student names and emails) being returned from a public cross-resource search endpoint; dedicated `/mentors` endpoints require student auth instead.
 - **Personalized Announcements:** current `announcements` schema already supports department/semester targeting; a full "personalization" ranking layer can be added later without a schema change.

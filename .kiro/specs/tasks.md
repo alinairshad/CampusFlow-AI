@@ -172,3 +172,18 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 12.7 Frontend: build student-facing Societies browse page (`SocietiesPage.jsx`) — debounced search bar, category filter chips, entry cards (name, category badge, one-line description preview), click-through to full detail view; add `/societies` route to `App.jsx` (student ProtectedRoute) and a "Societies" card to `StudentDashboardPlaceholder.jsx`
 - [ ] 12.8 Test full flow: admin creates societies → student browses and searches → student views full detail including optional fields (social media, faculty advisor) and contact info
 - [ ] 12.9 Extend `GET /search` to include societies as a third result section (`society_results`) alongside `document_results` and `directory_results` — `$text` search over societies collection, same university_id scoping, returns `{id, name, category, description_preview}` per hit; update the "no results" message to cover all three sections
+
+---
+
+## Stage 13 — Senior-Junior Mentorship Directory
+*Implements Requirement 13*
+
+- [ ] 13.1 Extend `StudentProfileInDB` with `is_mentor: bool = False` field; add `is_mentor` to `StudentProfileUpdateRequest` and `StudentProfileResponse` in `models/user.py`
+- [ ] 13.2 Extend `_create_indexes` in `mongo.py` to add: compound index on `student_profiles(is_mentor, university_id)` for mentor list queries, and text index on `student_profiles(name, interests)` for keyword search
+- [ ] 13.3 Implement `GET /mentors` — returns all students with `is_mentor=True` scoped to `university_id`, sorted by name; requires valid student JWT (Option A — auth-required, not public, to protect student emails)
+- [ ] 13.4 Implement `GET /mentors/search?q=&department=` — `$text` search across name and interests, optional exact `department` filter; same student-auth requirement; empty q + no dept returns all mentors (same as `GET /mentors`)
+- [ ] 13.5 Verify `PUT /students/me` correctly persists `is_mentor` when included in the request body — no new endpoint needed, extends the existing partial-update handler
+- [ ] 13.6 Test: student enables is_mentor → appears in GET /mentors → student disables → disappears; search by department and keyword both work; university_id isolation confirmed; unauthenticated request returns 401
+- [ ] 13.7 Frontend: add `is_mentor` toggle to student profile — simple checkbox/toggle on the Student Dashboard or a profile card, wired to `PUT /students/me`
+- [ ] 13.8 Frontend: build student-facing Mentors browse page (`MentorsPage.jsx`) — department filter dropdown, keyword search bar (debounced, 400ms), mentor cards (name, department, semester, batch, interests chips, contact email), click-through to a simple detail view or inline expand; add `/mentors` route to `App.jsx` (student ProtectedRoute) and a "Mentors" card to `StudentDashboardPlaceholder.jsx`
+- [ ] 13.9 Test full flow: student A enables mentor toggle → student B (logged in) browses `/mentors` and finds student A → student B sees student A's contact email → unauthenticated access to `/mentors` returns 401
