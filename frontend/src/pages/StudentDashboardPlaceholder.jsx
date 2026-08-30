@@ -1,10 +1,10 @@
 /**
- * Student Dashboard (Stage 7).
+ * Student Dashboard (Stage 7 + Stage 13 mentor toggle).
  */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
-import { getStudentDashboard } from '../api/students'
+import { getStudentDashboard, updateStudentProfile } from '../api/students'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -29,7 +29,26 @@ function StatusBadge({ status }) {
   )
 }
 
-function ProfileCard({ profile }) {
+function ProfileCard({ profile, token }) {
+  const [isMentor, setIsMentor]     = useState(profile.is_mentor ?? false)
+  const [toggling, setToggling]     = useState(false)
+  const [toggleError, setToggleError] = useState('')
+
+  async function handleToggle() {
+    setToggling(true)
+    setToggleError('')
+    const next = !isMentor
+    try {
+      const updated = await updateStudentProfile({ is_mentor: next }, token)
+      setIsMentor(updated.is_mentor)
+    } catch (err) {
+      const detail = err.response?.data?.detail
+      setToggleError(typeof detail === 'string' ? detail : 'Update failed.')
+    } finally {
+      setToggling(false)
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
       <div className="flex items-center gap-4">
@@ -41,6 +60,7 @@ function ProfileCard({ profile }) {
           <p className="text-sm text-gray-500 truncate">{profile.email}</p>
         </div>
       </div>
+
       <div className="mt-4 flex flex-wrap gap-2">
         {[{ label: 'Dept', value: profile.department }, { label: 'Semester', value: profile.semester }, { label: 'Batch', value: profile.batch }].map(({ label, value }) => (
           <div key={label} className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
@@ -49,6 +69,38 @@ function ProfileCard({ profile }) {
           </div>
         ))}
       </div>
+
+      {/* Mentor availability toggle */}
+      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gray-800">Available as mentor</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {isMentor
+              ? 'You appear in the Mentors directory. Fellow students can find and contact you.'
+              : 'Enable to appear in the Mentors directory and help junior students.'}
+          </p>
+          {toggleError && (
+            <p className="text-xs text-red-500 mt-1">{toggleError}</p>
+          )}
+        </div>
+
+        {/* Toggle switch */}
+        <button
+          onClick={handleToggle}
+          disabled={toggling}
+          aria-pressed={isMentor}
+          aria-label="Toggle mentor availability"
+          className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200
+                       focus:outline-none focus:ring-2 focus:ring-lgu-400 focus:ring-offset-1
+                       disabled:opacity-50
+                       ${isMentor ? 'bg-lgu-700' : 'bg-gray-300'}`}
+        >
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow
+                            transition-transform duration-200
+                            ${isMentor ? 'translate-x-5' : 'translate-x-0'}`} />
+        </button>
+      </div>
+
       <p className="mt-3 text-xs text-gray-400">Member since {formatDate(profile.created_at)}</p>
     </div>
   )
@@ -146,7 +198,7 @@ export default function StudentDashboardPlaceholder() {
           <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>
         ) : dashboard ? (
           <>
-            <ProfileCard profile={dashboard.profile} />
+            <ProfileCard profile={dashboard.profile} token={token} />
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: 'Assistant', sub: 'Ask anything', to: '/assistant', icon: 'AI' },
