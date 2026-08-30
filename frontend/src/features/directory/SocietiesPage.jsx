@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SocietiesPage — student-facing university societies browse.
  *
  * Extensions over DirectoryPage pattern:
@@ -279,7 +279,7 @@ export default function SocietiesPage() {
             Societies
           </span>
         </div>
-        <button onClick={logout} className="text-sm text-gray-400 hover:text-red-500 transition-colors">
+        <button onClick={logout} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 rounded-lg px-3 py-1.5 transition-colors">
           Sign out
         </button>
       </header>

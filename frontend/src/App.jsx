@@ -5,6 +5,7 @@ import ProtectedRoute from './auth/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
+import LandingPage from './pages/LandingPage'
 import StudentDashboardPlaceholder from './pages/StudentDashboardPlaceholder'
 import AdminDashboardPlaceholder from './pages/AdminDashboardPlaceholder'
 import ChatPage from './features/assistant/ChatPage'
@@ -84,8 +85,8 @@ export default function App() {
             }
           />
 
-          {/* Root → /login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* Root → landing page */}
+          <Route path="/" element={<LandingPage />} />
 
           {/* Catch-all → /login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
