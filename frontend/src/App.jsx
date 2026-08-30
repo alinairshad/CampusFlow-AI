@@ -11,6 +11,7 @@ import ChatPage from './features/assistant/ChatPage'
 import ApplicationPage from './features/applications/ApplicationPage'
 import DirectoryPage from './features/directory/DirectoryPage'
 import SocietiesPage from './features/directory/SocietiesPage'
+import MentorsPage from './features/directory/MentorsPage'
 
 export default function App() {
   return (
@@ -61,6 +62,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="student">
                 <SocietiesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mentors"
+            element={
+              <ProtectedRoute requiredRole="student">
+                <MentorsPage />
               </ProtectedRoute>
             }
           />
