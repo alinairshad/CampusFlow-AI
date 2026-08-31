@@ -279,7 +279,7 @@ export default function SocietiesPage() {
             Societies
           </span>
         </div>
-        <button onClick={logout} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 rounded-lg px-3 py-1.5 transition-colors">
+        <button onClick={logout} className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors">
           Sign out
         </button>
       </header>

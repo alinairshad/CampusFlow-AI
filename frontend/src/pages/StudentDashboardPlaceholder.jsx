@@ -183,7 +183,7 @@ export default function StudentDashboardPlaceholder() {
           <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" />
           <span className="text-lg font-bold text-lgu-700">LGU AI Assistant</span>
         </div>
-        <button onClick={logout} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-red-600 border border-gray-300 hover:border-red-300 rounded-lg px-3 py-1.5 transition-colors">Sign out</button>
+        <button onClick={logout} className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors">Sign out</button>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
