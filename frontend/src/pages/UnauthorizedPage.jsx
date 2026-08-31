@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 
 export default function UnauthorizedPage() {
   return (
@@ -10,7 +10,7 @@ export default function UnauthorizedPage() {
           You don't have permission to view this page.
         </p>
         <Link to="/login" className="text-sm text-lgu-700 hover:underline">
-          Back to sign in
+          Back to login
         </Link>
       </div>
     </div>

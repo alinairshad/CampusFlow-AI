@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/auth'
 import { useAuth } from '../auth/AuthContext'
@@ -42,12 +42,12 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-6">
           <img src="/lgu-logo.png" alt="LGU" className="h-16 w-auto mb-3" />
           <h1 className="text-2xl font-bold text-lgu-700">LGU AI Assistant</h1>
-          <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
+          <p className="text-gray-500 text-sm mt-1">Login to your account</p>
         </div>
 
         {justRegistered && (
           <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mb-4">
-            Account created — sign in below.
+            Account created — login below.
           </p>
         )}
 
@@ -69,7 +69,7 @@ export default function LoginPage() {
 
           <button type="submit" disabled={loading}
                   className="w-full bg-lgu-700 hover:bg-lgu-800 disabled:opacity-50 text-white font-medium rounded-lg py-2 text-sm transition-colors">
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Logging in…' : 'Login'}
           </button>
         </form>
 

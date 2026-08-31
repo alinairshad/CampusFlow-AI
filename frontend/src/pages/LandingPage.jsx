@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 
 function RoleCard({ icon, label, description, to }) {
   return (
@@ -17,7 +17,7 @@ function RoleCard({ icon, label, description, to }) {
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">{description}</p>
       </div>
       <span className="text-xs font-medium text-lgu-700 group-hover:underline">
-        Sign in →
+        Login →
       </span>
     </Link>
   )

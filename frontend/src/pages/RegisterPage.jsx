@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerStudent } from '../api/auth'
 
@@ -75,7 +75,7 @@ export default function RegisterPage() {
 
         <p className="mt-4 text-sm text-center text-gray-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-lgu-700 hover:underline">Sign in</Link>
+          <Link to="/login" className="text-lgu-700 hover:underline">Login</Link>
         </p>
       </div>
     </div>
