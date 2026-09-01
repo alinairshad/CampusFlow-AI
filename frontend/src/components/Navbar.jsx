@@ -11,7 +11,7 @@
  * Mobile (< md): nav links collapse; hamburger toggles a dropdown panel.
  */
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
 // ---------------------------------------------------------------------------
@@ -31,7 +31,7 @@ const STUDENT_LINKS = [
 function navLinkClass({ isActive }) {
   return isActive
     ? 'text-xs font-semibold text-lgu-700 underline underline-offset-4 decoration-lgu-700 whitespace-nowrap'
-    : 'text-xs text-gray-500 hover:text-lgu-700 transition-colors whitespace-nowrap'
+    : 'text-xs text-lgu-900/60 hover:text-lgu-700 transition-colors whitespace-nowrap'
 }
 
 // ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ export default function Navbar() {
   return (
     /* Outer wrapper: provides the floating margin around the pill */
     <div className="px-3 pt-3 pb-0 shrink-0">
-      <nav className="bg-white rounded-full shadow-md px-4 py-2.5
+      <nav className="bg-lgu-100 rounded-full shadow-md px-4 py-2.5
                       flex items-center justify-between relative">
 
         {/* ── Left: logo + wordmark ──────────────────────────────────── */}
@@ -103,7 +103,7 @@ export default function Navbar() {
             LGU AI Assistant
           </span>
           {isAdmin && (
-            <span className="text-xs bg-lgu-100 text-lgu-700 font-medium
+            <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
                              px-2 py-0.5 rounded-full hidden sm:inline-block">
               Admin
             </span>
@@ -127,8 +127,8 @@ export default function Navbar() {
           <button
             onClick={logout}
             className="bg-lgu-700 hover:bg-lgu-800 text-white text-xs
-                       font-medium rounded-full px-4 py-1.5 transition-colors
-                       whitespace-nowrap"
+                       font-semibold rounded-full px-4 py-1.5 transition-colors
+                       whitespace-nowrap shadow-sm"
           >
             Sign out
           </button>
@@ -139,8 +139,8 @@ export default function Navbar() {
               onClick={() => setMenuOpen((v) => !v)}
               aria-label={menuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={menuOpen}
-              className="md:hidden p-1 rounded-full text-gray-500
-                         hover:bg-gray-100 transition-colors"
+              className="md:hidden p-1 rounded-full text-lgu-700/70
+                         hover:bg-lgu-100 transition-colors"
             >
               {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
             </button>
