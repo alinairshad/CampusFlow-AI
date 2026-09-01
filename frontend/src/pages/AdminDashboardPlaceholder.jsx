@@ -9,9 +9,10 @@ import DirectoryManager from '../features/admin/DirectoryManager'
 import SocietyManager from '../features/admin/SocietyManager'
 import StatsWidget from '../features/admin/StatsWidget'
 import { listDocuments } from '../api/documents'
+import Navbar from '../components/Navbar'
 
 export default function AdminDashboardPlaceholder() {
-  const { user, token, logout } = useAuth()
+  const { token } = useAuth()
 
   const [documents, setDocuments] = useState([])
   const [loading, setLoading] = useState(true)
@@ -38,27 +39,7 @@ export default function AdminDashboardPlaceholder() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top nav */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" />
-          <span className="text-lg font-bold text-lgu-700">LGU AI Assistant</span>
-          <span className="text-xs bg-lgu-100 text-lgu-700 font-medium px-2 py-0.5 rounded-full">
-            Admin
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-500 hidden sm:block">
-            {user?.user_id}
-          </span>
-          <button
-            onClick={logout}
-            className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main content */}
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">

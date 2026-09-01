@@ -9,13 +9,12 @@
  * No auth required; the directory is public.
  */
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import {
   getDirectoryEntry,
   listDirectoryEntries,
   searchDirectoryEntries,
 } from '../../api/directory'
-import { useAuth } from '../../auth/AuthContext'
+import Navbar from '../../components/Navbar'
 
 // ---------------------------------------------------------------------------
 // Category badge colours  (mirrors admin DirectoryManager)
@@ -166,7 +165,7 @@ function EntryDetail({ entry, onBack }) {
 // Main page
 // ---------------------------------------------------------------------------
 export default function DirectoryPage() {
-  const { logout } = useAuth()
+  // useAuth not destructured — Navbar handles auth internally
 
   const [view, setView]         = useState('list')    // 'list' | 'detail'
   const [entries, setEntries]   = useState([])
@@ -245,28 +244,7 @@ export default function DirectoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top nav */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link to="/dashboard"
-                className="text-gray-400 hover:text-gray-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                 className="w-5 h-5">
-              <path fillRule="evenodd"
-                d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
-                clipRule="evenodd" />
-            </svg>
-          </Link>
-          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" /><span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
-          <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
-            Directory
-          </span>
-        </div>
-        <button onClick={logout}
-                className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors">
-          Sign out
-        </button>
-      </header>
+      <Navbar />
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
         {view === 'list' ? (

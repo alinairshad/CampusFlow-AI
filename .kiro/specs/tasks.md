@@ -211,3 +211,16 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 15.4 Wire the mobile drawer: sidebar hidden by default on `< md` breakpoints, slides in as an overlay when `sidebarOpen=true`; semi-transparent backdrop closes it on click; hamburger icon toggles it
 - [ ] 15.5 Add `convLoading` guard — disable the send input and show a loading indicator in the chat area while a past conversation is being fetched; re-enable once loaded
 - [ ] 15.6 Verify: open AI Assistant → sidebar shows past conversations → click one → full message history loads → send a new message → it appends to that thread → click "+ New Chat" → blank slate, new thread on next send → mobile: hamburger opens drawer, backdrop closes it
+
+---
+
+## Stage 16 — App-wide Pill Navbar
+*Implements Requirement 16*
+
+- [ ] 16.1 Create `src/components/Navbar.jsx` — pill-shaped floating navbar; reads `user.role` from `useAuth()` and current path from `useLocation()`; renders logo + wordmark on left, student nav links (Dashboard, Assistant, Applications, Directory, Societies) in center/left-adjacent with active-link highlight, Sign out pill-button on right; Admin role shows "Admin" badge and no nav links; all links use React Router `<NavLink>`
+- [ ] 16.2 Add mobile hamburger menu to `Navbar.jsx` — hidden on `md+`; toggles a dropdown panel with all nav links + Sign out; closes on outside click/touch via `useEffect` document listener; closes on any link click
+- [ ] 16.3 Remove `<header>` block from `StudentDashboardPlaceholder.jsx` and replace with `<Navbar />`; remove `logout` import usage from header (still used elsewhere if needed)
+- [ ] 16.4 Remove `<header>` block from `AdminDashboardPlaceholder.jsx` and replace with `<Navbar />`
+- [ ] 16.5 Remove `<header>` block from `ChatPage.jsx` (including hamburger sidebar toggle); insert `<Navbar />` as first child of the root flex-col; move sidebar hamburger trigger into `ConversationSidebar` or keep it in the sidebar header — chat layout preserved with `flex flex-1 overflow-hidden` wrapper around sidebar + chat column
+- [ ] 16.6 Remove `<header>` blocks from `DirectoryPage.jsx`, `SocietiesPage.jsx`, `MentorsPage.jsx`, and `ApplicationPage.jsx`; replace each with `<Navbar />`; remove per-page back-arrow links (navbar provides full navigation)
+- [ ] 16.7 Build check — `npm run build` must pass with 0 errors; verify all 7 pages compile cleanly and nav links resolve to correct routes

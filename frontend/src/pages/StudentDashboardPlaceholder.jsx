@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { getStudentDashboard, updateStudentProfile } from '../api/students'
+import Navbar from '../components/Navbar'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -167,7 +168,7 @@ function RecentConversations({ conversations }) {
 }
 
 export default function StudentDashboardPlaceholder() {
-  const { token, logout } = useAuth()
+  const { token } = useAuth()
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -182,13 +183,7 @@ export default function StudentDashboardPlaceholder() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" />
-          <span className="text-lg font-bold text-lgu-700">LGU AI Assistant</span>
-        </div>
-        <button onClick={logout} className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors">Sign out</button>
-      </header>
+      <Navbar />
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
         {loading ? (

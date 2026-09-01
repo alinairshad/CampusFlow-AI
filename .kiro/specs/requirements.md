@@ -243,3 +243,22 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 8. WHEN the drawer is open on mobile THEN tapping outside the drawer SHALL close it.
 9. WHEN a past conversation is loading THEN the system SHALL show a loading state in the chat area and SHALL NOT allow a new message to be sent until loading completes.
 10. WHEN the conversations list is empty THEN the sidebar SHALL display a brief "No conversations yet" placeholder instead of an empty list.
+
+---
+
+## Requirement 16: App-wide Pill Navbar Redesign
+
+**User Story:** As a student or admin, I want a consistent, visually polished navigation bar across all authenticated pages, so that I can move between sections without the navigation feeling inconsistent or plain.
+
+### Acceptance Criteria
+
+1. WHEN any authenticated page is rendered THEN the system SHALL display a shared `Navbar` component at the top of the page, replacing each page's individual header markup.
+2. WHEN the navbar is rendered THEN it SHALL appear as a floating pill/capsule shape — white background, fully rounded ends (`rounded-full`), subtle drop shadow, with horizontal and vertical margin so it does not touch the screen edges.
+3. WHEN the navbar is rendered THEN it SHALL show the LGU logo and "LGU AI Assistant" wordmark on the left side.
+4. WHEN a student views an authenticated page THEN the navbar SHALL include navigation links for Dashboard, Assistant, Applications, Directory, and Societies; the link for the currently active page SHALL be visually distinguished (LGU green colour and bold weight); inactive links SHALL appear in muted gray with an LGU green hover transition.
+5. WHEN any authenticated user views the navbar THEN a "Sign out" button SHALL appear on the right side as a solid LGU-green pill-shaped button with white text.
+6. WHEN the viewport is below the `md` breakpoint THEN the navigation links SHALL collapse and a hamburger menu icon SHALL appear; tapping it SHALL open a dropdown or drawer containing all nav links plus the Sign out action.
+7. WHEN the hamburger menu is open on mobile THEN tapping outside it or tapping a link SHALL close it.
+8. WHEN the navbar is built THEN it SHALL be a single reusable `Navbar.jsx` component consumed by all authenticated pages — no per-page duplication of header markup.
+9. WHEN the navbar is added to a page THEN all existing navigation, auth, and routing behaviour SHALL remain exactly as before — this is a visual and structural change only.
+10. WHEN the admin dashboard is viewed THEN the navbar SHALL display an "Admin" role badge alongside the wordmark to distinguish the admin context visually.

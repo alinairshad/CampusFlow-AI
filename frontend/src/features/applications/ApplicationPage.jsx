@@ -14,9 +14,10 @@
  *   location.state.applicationType — suggested type
  */
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import { generateApplication, downloadApplicationPdf } from '../../api/applications'
+import Navbar from '../../components/Navbar'
 
 // ---------------------------------------------------------------------------
 // Application type options (must match backend APP_TYPE_LABELS)
@@ -184,7 +185,6 @@ function GeneratedApplication({ appId, bodyText, onBodyChange, onDownload, downl
 export default function ApplicationPage() {
   const { token } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
 
   // Pre-fill from ActionPlanCard navigation state (Task 5.11)
   const prefill = location.state || {}
@@ -278,24 +278,7 @@ export default function ApplicationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top nav */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link to="/assistant"
-                className="text-gray-400 hover:text-gray-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                 className="w-5 h-5">
-              <path fillRule="evenodd"
-                d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
-                clipRule="evenodd" />
-            </svg>
-          </Link>
-          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" /><span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
-          <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
-            Application Generator
-          </span>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div>

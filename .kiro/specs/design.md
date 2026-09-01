@@ -427,3 +427,80 @@ When a sidebar item is clicked:
 5. Close the mobile drawer if open.
 
 Source chips and action plan cards are reconstructed from the persisted `sources` and `action_plan` fields on each message, so historical problem responses render correctly.
+
+---
+
+## 14. App-wide Pill Navbar
+
+### Overview
+
+Each authenticated page currently contains its own `<header>` block with duplicated markup. This is replaced by a single `Navbar.jsx` component that all pages import. No routing, auth, or backend changes are required.
+
+### Visual Design
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  mx-4 my-3 (floating margin around the pill)             │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │ [LGU logo] LGU AI Assistant  │ Dashboard  Assistant │ │  ← rounded-full, shadow-md, bg-white
+│  │                              │ Applications Dir…    │ │
+│  │                              │            [Sign out]│ │
+│  └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+Key CSS: `rounded-full shadow-md bg-white px-5 py-2.5 mx-4 my-3 flex items-center justify-between`
+
+### Props
+
+```
+Navbar
+  role        : "student" | "admin"   — controls which links to show
+  (no other props — reads useAuth() and useLocation() internally)
+```
+
+`Navbar` calls `useAuth()` itself for `logout`, and `useLocation()` for the active-link check. Pages pass only `role` (or nothing if role can be inferred from `user.role` in AuthContext).
+
+In practice, each page simply renders `<Navbar />` with no props — the component reads `user.role` from `useAuth()` and `pathname` from `useLocation()`.
+
+### Nav links (student)
+
+| Label         | Path            |
+|--------------|-----------------|
+| Dashboard     | `/dashboard`    |
+| Assistant     | `/assistant`    |
+| Applications  | `/applications` |
+| Directory     | `/directory`    |
+| Societies     | `/societies`    |
+
+Admin sees no nav links — only the logo, "Admin" role badge, and Sign out button (admin has a single-page dashboard with no sub-navigation).
+
+### Active link style
+
+```
+active   : font-semibold text-lgu-700 underline underline-offset-4 decoration-lgu-700
+inactive : text-gray-500 hover:text-lgu-700 transition-colors
+```
+
+### Sign out button
+
+```
+bg-lgu-700 hover:bg-lgu-800 text-white text-xs font-medium
+rounded-full px-4 py-1.5 transition-colors
+```
+
+Pill-shaped (`rounded-full`) to match the navbar's own pill shape.
+
+### Mobile behaviour (`< md`)
+
+Nav links hidden. A hamburger icon (`☰`) appears in the right area, left of the Sign out button. Tapping it toggles a dropdown panel anchored below the pill, containing all nav links in a vertical list + a divider + Sign out. Clicking any link or outside the panel closes it. Implemented with a `menuOpen` boolean state and a `useEffect` that adds a `mousedown` / `touchstart` listener on `document` to close on outside click.
+
+### ChatPage integration
+
+`ChatPage` uses a `flex flex-col h-screen` root. The `Navbar` is inserted as the first child, making the conversation area flex-grow beneath it. The sidebar and chat column remain in their own inner `flex flex-1 overflow-hidden` div below the navbar. This preserves the full-height chat layout.
+
+### Removed from each page
+
+- The entire `<header>…</header>` block
+- The per-page `logout` button
+- The per-page back-arrow link (those arrows become unnecessary because the navbar provides direct links to all sections)

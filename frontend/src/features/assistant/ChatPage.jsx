@@ -16,6 +16,7 @@ import { sendQuery, listConversations, getConversation } from '../../api/assista
 import ConversationSidebar from './ConversationSidebar'
 import SourceChip from './SourceChip'
 import ActionPlanCard from './ActionPlanCard'
+import Navbar from '../../components/Navbar'
 
 // ---------------------------------------------------------------------------
 // Sub-components (unchanged)
@@ -126,7 +127,7 @@ function mapHistoryMessage(m) {
 // ---------------------------------------------------------------------------
 
 export default function ChatPage() {
-  const { token, logout } = useAuth()
+  const { token } = useAuth()
 
   // ── Chat state ────────────────────────────────────────────────────────────
   const [messages, setMessages]     = useState([])
@@ -243,48 +244,41 @@ export default function ChatPage() {
   const isBlocked = loading || convLoading
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+      <Navbar />
 
-      {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-      <ConversationSidebar
-        conversations={conversations}
-        activeConvId={convId}
-        onSelect={handleSelectConversation}
-        onNewChat={handleNewChat}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
+      {/* ── Sidebar + chat row ───────────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden">
 
-      {/* ── Main chat column ─────────────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 min-w-0 h-full">
+        {/* ── Sidebar ────────────────────────────────────────────────── */}
+        <ConversationSidebar
+          conversations={conversations}
+          activeConvId={convId}
+          onSelect={handleSelectConversation}
+          onNewChat={handleNewChat}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        {/* Top nav */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2">
-            {/* Hamburger — mobile only */}
+        {/* ── Main chat column ───────────────────────────────────────── */}
+        <div className="flex flex-col flex-1 min-w-0 h-full">
+
+          {/* Chat sub-header: sidebar toggle (mobile) + context label */}
+          <div className="bg-white border-b border-gray-100 px-4 py-2 flex items-center gap-2 shrink-0">
+            {/* Hamburger for sidebar — mobile only */}
             <button
               onClick={() => setSidebarOpen(true)}
               aria-label="Open conversation history"
-              className="md:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 mr-1"
+              className="md:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
                 <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
               </svg>
             </button>
-
-            <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto" />
-            <span className="text-base font-bold text-lgu-700">LGU AI Assistant</span>
-            <span className="text-xs bg-lgu-50 text-lgu-700 px-2 py-0.5 rounded-full font-medium">
+            <span className="text-xs font-medium text-lgu-700 bg-lgu-50 px-2 py-0.5 rounded-full">
               Assistant
             </span>
           </div>
-          <button
-            onClick={logout}
-            className="text-xs font-medium bg-lgu-700 hover:bg-lgu-800 text-white rounded-lg px-3 py-1.5 transition-colors"
-          >
-            Sign out
-          </button>
-        </header>
 
         {/* Message list */}
         <div className="flex-1 overflow-y-auto px-4 py-6">
@@ -393,6 +387,7 @@ export default function ChatPage() {
         </div>
 
       </div>{/* end main chat column */}
+      </div>{/* end sidebar + chat row */}
     </div>
   )
 }
