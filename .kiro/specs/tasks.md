@@ -199,3 +199,15 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 14.4 Apply hover behaviour: `hover:bg-lgu-50` tint on the tile row, remove `hover:shadow-sm` — no drop shadow on hover
 - [ ] 14.5 Verify responsiveness: tile list is single-column on mobile, looks correct at 320px–768px+ breakpoints
 - [ ] 14.6 Verify all existing behaviour is preserved: all links navigate correctly, mentor toggle still works, Recent Applications and Recent Conversations widgets unchanged
+
+---
+
+## Stage 15 — AI Assistant Chat History Sidebar
+*Implements Requirement 15*
+
+- [ ] 15.1 Create `ConversationSidebar.jsx` in `src/features/assistant/` — presentational component accepting `conversations`, `activeConvId`, `onSelect`, `onNewChat`, `isOpen` (mobile), `onClose` props; renders "+ New Chat" button, divider-separated conversation items with truncated preview and relative timestamp, active highlight, sage-green hover, and "No conversations yet" empty state
+- [ ] 15.2 Add `formatRelativeTime(dateStr)` pure helper (no external library) to `ConversationSidebar.jsx` or a shared `src/utils/time.js` — handles just-now / X min / X hours / X days / date-string cases
+- [ ] 15.3 Update `ChatPage.jsx` — add `conversations`, `convLoading`, and `sidebarOpen` state; call `listConversations(token)` on mount and after each successful `sendQuery` to keep sidebar fresh; handle `onSelect` to call `getConversation`, map returned messages into local shape, set `convId`; handle `onNewChat` to reset `messages` and `convId`; add mobile hamburger icon to header
+- [ ] 15.4 Wire the mobile drawer: sidebar hidden by default on `< md` breakpoints, slides in as an overlay when `sidebarOpen=true`; semi-transparent backdrop closes it on click; hamburger icon toggles it
+- [ ] 15.5 Add `convLoading` guard — disable the send input and show a loading indicator in the chat area while a past conversation is being fetched; re-enable once loaded
+- [ ] 15.6 Verify: open AI Assistant → sidebar shows past conversations → click one → full message history loads → send a new message → it appends to that thread → click "+ New Chat" → blank slate, new thread on next send → mobile: hamburger opens drawer, backdrop closes it

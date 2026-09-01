@@ -224,3 +224,22 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 4. WHEN the redesigned dashboard is viewed on mobile THEN the layout SHALL remain fully responsive; the tile list SHALL stack single-column naturally.
 5. WHEN the dashboard redesign is applied THEN it SHALL be a visual-only change — all existing navigation, click behaviour, data loading, mentor toggle, and link destinations SHALL remain exactly as before.
 6. WHEN the primary colour palette is applied THEN it SHALL use LGU green (#1B5E20) and white as the core palette, consistent with the rest of the application.
+
+---
+
+## Requirement 15: AI Assistant Chat History Sidebar
+
+**User Story:** As a student, I want to see and resume my past conversations with the AI Assistant, so that I can continue where I left off without having to re-ask questions I've already had answered.
+
+### Acceptance Criteria
+
+1. WHEN a student opens the AI Assistant page THEN the system SHALL display a sidebar listing their past conversations fetched from `GET /assistant/conversations`, up to 20 entries sorted newest-first as returned by the API.
+2. WHEN the sidebar renders a conversation entry THEN it SHALL show a short preview of the first user message (truncated) and a relative timestamp (e.g. "2 days ago").
+3. WHEN a student clicks a past conversation THEN the system SHALL call `GET /assistant/conversations/{id}`, load the full message list into the chat view, and set the active `conversationId` so that any new message continues that thread.
+4. WHEN a student clicks "+ New Chat" THEN the system SHALL clear the message list and reset the active `conversationId` to null, starting a fresh conversation.
+5. WHEN a conversation is active/selected THEN the system SHALL visually distinguish it in the sidebar using LGU green (#1B5E20) as the active indicator.
+6. WHEN a student hovers over a sidebar entry THEN the system SHALL show a subtle sage-green (#E8EDE4) background tint, consistent with the list-tile style used elsewhere in the app.
+7. WHEN the page is viewed on a mobile viewport THEN the sidebar SHALL collapse into a toggleable drawer opened and closed by a hamburger/menu icon, so the full chat area width is preserved on small screens.
+8. WHEN the drawer is open on mobile THEN tapping outside the drawer SHALL close it.
+9. WHEN a past conversation is loading THEN the system SHALL show a loading state in the chat area and SHALL NOT allow a new message to be sent until loading completes.
+10. WHEN the conversations list is empty THEN the sidebar SHALL display a brief "No conversations yet" placeholder instead of an empty list.

@@ -341,3 +341,89 @@ GET    /admin/stats                   (admin only — basic counts)
 - **Interactive campus map:** `departments_offices` can later add optional `latitude`/`longitude` fields without breaking existing records.
 - **Senior-Junior Mentorship:** implemented via an `is_mentor` boolean on `student_profiles` (default false) — students self-opt-in via `PUT /students/me`, existing `student_profiles` + `users` data surfaces as mentor listings via `/mentors` endpoints, no new collection required. Mentor data is **intentionally excluded from `GET /search`** to avoid PII (student names and emails) being returned from a public cross-resource search endpoint; dedicated `/mentors` endpoints require student auth instead.
 - **Personalized Announcements:** current `announcements` schema already supports department/semester targeting; a full "personalization" ranking layer can be added later without a schema change.
+
+---
+
+## 13. AI Assistant Chat History Sidebar
+
+### Overview
+
+The Chat History Sidebar adds conversation browsing and resumption to the existing `ChatPage.jsx` without any backend changes. All required endpoints (`GET /assistant/conversations`, `GET /assistant/conversations/{id}`) are already implemented and tested. The feature is purely a frontend addition.
+
+### Layout
+
+```
+┌──────────────────────────────────────────────────────┐
+│  Header (logo + "LGU AI Assistant" + Sign out)        │
+├────────────────┬─────────────────────────────────────┤
+│  Sidebar       │  Chat area (existing)                │
+│  (w-64, fixed) │                                      │
+│  ┌──────────┐  │  [message list]                      │
+│  │+ New Chat│  │                                      │
+│  └──────────┘  │                                      │
+│  ─────────     │                                      │
+│  [conv item]   │                                      │
+│  [conv item]   │  [input bar]                         │
+│  [conv item]   │                                      │
+└────────────────┴─────────────────────────────────────┘
+```
+
+On **mobile** (`< md` breakpoint) the sidebar is hidden by default and slides in as a full-height overlay drawer triggered by a hamburger icon in the header. A semi-transparent backdrop covers the chat area; tapping it closes the drawer.
+
+### Component Structure
+
+```
+ChatPage.jsx                   — page root, holds all state
+  ConversationSidebar.jsx      — sidebar/drawer, receives props only (no own data fetching)
+    + New Chat button
+    ConversationItem (inline)  — preview text + relative timestamp per entry
+  [existing chat area JSX]     — message list, input bar (unchanged)
+```
+
+`ChatPage.jsx` owns all state: `conversations[]`, `convId`, `messages[]`, `sidebarOpen` (mobile drawer). `ConversationSidebar` is a pure presentational component receiving data and callbacks via props, making it straightforward to test and re-use.
+
+### State additions to ChatPage
+
+| State var        | Type              | Purpose |
+|-----------------|-------------------|---------|
+| `conversations`  | `array`           | List from `GET /assistant/conversations` |
+| `convLoading`    | `boolean`         | True while loading a past conversation |
+| `sidebarOpen`    | `boolean`         | Mobile drawer open/closed |
+
+On mount, `ChatPage` calls `listConversations(token)` and stores the result. After each successful `sendQuery`, the conversations list is refreshed so the new conversation appears at the top of the sidebar immediately.
+
+### Visual Style
+
+Consistent with Requirement 14 and the rest of the app:
+
+- Sidebar background: white, right border `border-gray-200`
+- Active conversation: `bg-lgu-50 border-l-2 border-lgu-700` left accent bar
+- Hover: `hover:bg-[#E8EDE4]` (sage-green, inline style — not a Tailwind theme token)
+- "+ New Chat" button: `bg-lgu-700 text-white hover:bg-lgu-800`, full width
+- Preview text: one line, `truncate`, `text-sm text-gray-700`
+- Timestamp: `text-xs text-gray-400`
+- Hairline dividers: `divide-y divide-gray-100` between entries
+- Mobile hamburger icon: shown only at `md:hidden`, placed in the page header left of the logo
+
+### Relative Timestamps
+
+Computed client-side from the conversation's `updated_at` field using a small pure helper `formatRelativeTime(dateStr)`:
+
+- < 1 min → "Just now"
+- < 60 min → "X min ago"
+- < 24 h → "X hours ago"
+- < 7 days → "X days ago"
+- otherwise → locale date string (e.g. "12 Aug 2026")
+
+No external date library needed.
+
+### Loading a Past Conversation
+
+When a sidebar item is clicked:
+1. Set `convLoading = true`, clear `messages[]`, set `convId` to the clicked id.
+2. Call `getConversation(id, token)`.
+3. Map the returned `messages[]` array into the same local message shape used by new messages.
+4. Set `messages`, set `convLoading = false`.
+5. Close the mobile drawer if open.
+
+Source chips and action plan cards are reconstructed from the persisted `sources` and `action_plan` fields on each message, so historical problem responses render correctly.
