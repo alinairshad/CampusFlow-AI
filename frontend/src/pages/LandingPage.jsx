@@ -16,8 +16,8 @@ function RoleCard({ icon, label, description, to }) {
         <p className="text-base font-bold text-gray-900">{label}</p>
         <p className="text-xs text-gray-500 mt-1 leading-relaxed">{description}</p>
       </div>
-      <span className="text-xs font-medium text-lgu-700 group-hover:underline">
-        Login →
+      <span className="text-xs text-lgu-700 group-hover:underline">
+        <strong>Login</strong>
       </span>
     </Link>
   )
@@ -52,9 +52,12 @@ export default function LandingPage() {
           />
         </div>
 
-        <p className="text-center text-xs text-gray-400 pt-2">
-          New student?{' '}
-          <Link to="/register" className="text-lgu-700 hover:underline font-medium">
+        <p className="text-center text-xs pt-6">
+          <span className="text-gray-400">New student?</span>{' '}
+          <Link
+            to="/register"
+            className="text-lgu-700 font-semibold hover:underline"
+          >
             Register here
           </Link>
         </p>
