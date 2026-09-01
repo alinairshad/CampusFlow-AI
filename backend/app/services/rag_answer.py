@@ -11,7 +11,7 @@ import logging
 from app.core.config import settings
 from app.services.embeddings import generate_embedding
 from app.services.llm_client import LLMError, chat_completion
-from app.services.vector_store import search_similar
+from app.services.vector_store import search_keyword, search_similar
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +35,14 @@ complete question that will retrieve relevant university policy documents.
 
 Rules:
 - Keep the original intent exactly — do not change what is being asked.
-- Expand abbreviations and add context where obvious (e.g. "fee" → "student tuition fee").
+- Expand abbreviations and add context where obvious \
+  (e.g. "BSSE fee" → "What is the fee structure for BSSE Bachelor of Software Engineering?", \
+   "BSCS tuition" → "What is the tuition fee for BSCS Computer Science program?").
+- Common LGU program abbreviations: BSCS (Computer Science), BSSE (Software Engineering), \
+  BSIT (Information Technology), BSDS (Data Science), BSAI (Artificial Intelligence), \
+  BS CySec (Cyber Security), BBA (Business Administration), MBA, MPhil, PhD.
 - Output ONLY the rewritten question, no explanation, no quotes.
-- If the query is already clear, return it unchanged.
+- If the query is already a clear complete question, return it unchanged.
 """
 
 
@@ -174,6 +179,35 @@ async def generate_rag_answer(
         top_k=5,
         min_score=settings.RAG_MIN_SCORE,
     )
+
+    # ── Hybrid fallback — keyword search ─────────────────────────────────────
+    # Dense vector embeddings can score poorly on short abbreviation-heavy
+    # queries (e.g. "BSSE fee", "BSCS tuition") even when the exact text IS
+    # present in a chunk. When vector search yields nothing, fall back to a
+    # regex keyword match against the original and rewritten queries so that
+    # exact program abbreviations always surface the right chunk.
+    if not results:
+        # Try the rewritten query first (more words = more tokens to match),
+        # then fall back to the original if the rewrite also misses.
+        results = await search_keyword(
+            query=rewritten,
+            university_id=university_id,
+            category=category,
+            top_k=5,
+        )
+        if not results and rewritten != query.strip():
+            results = await search_keyword(
+                query=query.strip(),
+                university_id=university_id,
+                category=category,
+                top_k=5,
+            )
+        if results:
+            logger.info(
+                "RAG: vector search missed, keyword fallback returned %d chunk(s) "
+                "for query=%r",
+                len(results), rewritten[:60],
+            )
 
     # ── Task 3.4 — Deterministic "not found" fallback ─────────────────────────
     # If no chunks meet the threshold, return immediately — do NOT call the LLM.

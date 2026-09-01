@@ -157,6 +157,99 @@ async def search_similar(
 
 
 # ---------------------------------------------------------------------------
+# Keyword / regex fallback search
+# ---------------------------------------------------------------------------
+
+async def search_keyword(
+    query: str,
+    university_id: str,
+    category: str | None = None,
+    top_k: int = 5,
+    keyword_score: float = 0.60,
+) -> list[dict]:
+    """
+    Fallback keyword search using MongoDB regex on ``chunk_text``.
+
+    Used when vector search returns no results above the similarity threshold
+    — typically for queries that are short abbreviation-heavy strings whose
+    embeddings don't score well against any chunk but whose literal text
+    IS present in a chunk (e.g. "BSSE fee", "BSCS tuition").
+
+    Strategy
+    --------
+    - Extract individual tokens from the query (≥ 2 chars, alphanumeric).
+    - For each token build a case-insensitive regex.
+    - Score each candidate chunk by how many tokens it contains (0–1 range).
+    - Return only chunks that match ALL tokens (AND logic); fall back to ANY
+      (OR logic) if AND yields nothing.
+
+    Parameters
+    ----------
+    query         : original or rewritten query string
+    university_id : always filtered — no cross-university leakage
+    category      : optional document category filter
+    top_k         : max results to return
+    keyword_score : synthetic similarity score assigned to keyword hits
+
+    Returns
+    -------
+    Same shape as ``search_similar``:
+        [{"chunk_text", "document_id", "category", "chunk_index", "score"}, ...]
+    """
+    db = get_database()
+
+    # Tokenise: keep meaningful tokens only (≥2 chars, letters/digits/.)
+    import re
+    tokens = [
+        t for t in re.split(r"[\s,;:]+", query.strip())
+        if len(t) >= 2 and re.search(r"[A-Za-z0-9]", t)
+    ]
+    if not tokens:
+        return []
+
+    # Build per-token regex conditions
+    regex_conditions = [
+        {"chunk_text": {"$regex": re.escape(tok), "$options": "i"}}
+        for tok in tokens
+    ]
+
+    base_filter: dict = {"university_id": {"$eq": university_id}}
+    if category:
+        base_filter["category"] = {"$eq": category}
+
+    # Try AND first (all tokens must appear)
+    and_filter = {**base_filter, "$and": regex_conditions}
+    cursor = db[CHUNKS_COLLECTION].find(
+        and_filter,
+        {"_id": 0, "chunk_text": 1, "document_id": 1,
+         "category": 1, "chunk_index": 1},
+        limit=top_k,
+    )
+    results = await cursor.to_list(length=top_k)
+
+    # If AND yields nothing, fall back to OR (any token matches)
+    if not results and len(tokens) > 1:
+        or_filter = {**base_filter, "$or": regex_conditions}
+        cursor = db[CHUNKS_COLLECTION].find(
+            or_filter,
+            {"_id": 0, "chunk_text": 1, "document_id": 1,
+             "category": 1, "chunk_index": 1},
+            limit=top_k,
+        )
+        results = await cursor.to_list(length=top_k)
+
+    # Attach a synthetic score so downstream code can treat these uniformly
+    for r in results:
+        r["score"] = keyword_score
+
+    logger.info(
+        "Keyword search: university=%s  tokens=%s  results=%d",
+        university_id, tokens, len(results),
+    )
+    return results
+
+
+# ---------------------------------------------------------------------------
 # Delete
 # ---------------------------------------------------------------------------
 
