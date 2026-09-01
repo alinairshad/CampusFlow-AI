@@ -37,9 +37,13 @@ app = FastAPI(
 # ---------------------------------------------------------------------------
 # CORS
 # ---------------------------------------------------------------------------
+# allow_origin_regex covers Vercel preview deployments (campus-flow-*-*.vercel.app)
+# so that preview URLs work alongside the stable production domain.
+# The stable domain is also listed explicitly in ALLOWED_ORIGINS (env var).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
+    allow_origin_regex=r"https://campus-flow-[\w-]+\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
