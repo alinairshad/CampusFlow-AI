@@ -187,3 +187,15 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 13.7 Frontend: add `is_mentor` toggle to student profile — simple checkbox/toggle on the Student Dashboard or a profile card, wired to `PUT /students/me`
 - [ ] 13.8 Frontend: build student-facing Mentors browse page (`MentorsPage.jsx`) — department filter dropdown, keyword search bar (debounced, 400ms), mentor cards (name, department, semester, batch, interests chips, contact email), click-through to a simple detail view or inline expand; add `/mentors` route to `App.jsx` (student ProtectedRoute) and a "Mentors" card to `StudentDashboardPlaceholder.jsx`
 - [ ] 13.9 Test full flow: student A enables mentor toggle → student B (logged in) browses `/mentors` and finds student A → student B sees student A's contact email → unauthenticated access to `/mentors` returns 401
+
+---
+
+## Stage 14 — Student Dashboard Visual Redesign
+*Implements Requirement 14*
+
+- [ ] 14.1 Restyle `ProfileCard` as an ID-card motif: add a solid LGU green accent bar along the top edge (`h-2 bg-lgu-700 rounded-t-2xl`), add an LGU crest/seal mark in the top-right corner; all existing content (avatar, name, email, dept/semester/batch tags, mentor toggle, member-since date) unchanged
+- [ ] 14.2 Replace the 3-column shadow-card grid (Assistant, Applications, Directory) with a list-tile layout: each tile is a full-width `<Link>` row with left-aligned icon circle (sage-green `#E8EDE4` background, LGU green icon), label + subtitle, right-pointing chevron, hairline `divide-y` divider between rows, wrapped in a single white rounded card
+- [ ] 14.3 Replace the standalone Societies and Mentors full-width cards with the same list-tile format, consolidating all five quick-access entries into one unified tile list
+- [ ] 14.4 Apply hover behaviour: `hover:bg-lgu-50` tint on the tile row, remove `hover:shadow-sm` — no drop shadow on hover
+- [ ] 14.5 Verify responsiveness: tile list is single-column on mobile, looks correct at 320px–768px+ breakpoints
+- [ ] 14.6 Verify all existing behaviour is preserved: all links navigate correctly, mentor toggle still works, Recent Applications and Recent Conversations widgets unchanged

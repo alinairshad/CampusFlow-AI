@@ -209,3 +209,18 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 7. WHEN mentor data is displayed THEN the system SHALL pull it from existing `student_profiles` and `users` data — no new collection is required.
 8. WHEN the system displays mentor listings THEN it SHALL scope the results by `university_id` so students only see mentors from their own university.
 9. WHEN an unauthenticated request is made to the mentor listing or search endpoints THEN the system SHALL reject the request with 401 Unauthorized — mentor listings are student-auth-required (not public) to protect student contact information from being freely crawled.
+
+---
+
+## Requirement 14: Student Dashboard Visual Redesign
+
+**User Story:** As a student, I want the dashboard to feel like it belongs to LGU — not a generic SaaS product — so that it reflects the university's institutional identity.
+
+### Acceptance Criteria
+
+1. WHEN a student views the dashboard THEN the Profile card SHALL be restyled as an "ID card" motif with a solid LGU green accent bar along the top edge and an LGU crest or seal mark in a corner; all existing content (avatar, name, email, Dept/Semester/Batch tags, mentor toggle, member-since date) SHALL remain intact and functional.
+2. WHEN a student views the quick-access section THEN the uniform shadow-cards for Assistant, Applications, Directory, Societies, and Mentors SHALL be replaced with a list-tile layout — left-aligned icon, label, and description per row, separated by hairline dividers, with icons in sage-green (#E8EDE4) backgrounds and LGU green icon colour.
+3. WHEN a student hovers over a quick-access tile THEN the tile SHALL show a subtle green background tint with no drop shadow, replacing the current shadow-on-hover behaviour.
+4. WHEN the redesigned dashboard is viewed on mobile THEN the layout SHALL remain fully responsive; the tile list SHALL stack single-column naturally.
+5. WHEN the dashboard redesign is applied THEN it SHALL be a visual-only change — all existing navigation, click behaviour, data loading, mentor toggle, and link destinations SHALL remain exactly as before.
+6. WHEN the primary colour palette is applied THEN it SHALL use LGU green (#1B5E20) and white as the core palette, consistent with the rest of the application.

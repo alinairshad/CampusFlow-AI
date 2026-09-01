@@ -67,6 +67,8 @@ src/
 
 **Chat UI:** streams or polls assistant responses, renders source citations as expandable reference chips beneath each AI message, and renders a distinct "Action Plan" card format (department, docs required, steps, next action) when the response type is `action_plan`, versus a plain answer bubble for `knowledge_answer` type responses. This distinction comes from the backend response `type` field (see API structure below).
 
+**Student Dashboard visual identity:** the dashboard uses LGU green (#1B5E20) and white as its core palette. The Profile card uses an "ID card" motif (solid green accent bar at the top, LGU crest mark). The quick-access navigation section uses a list-tile layout with hairline dividers, sage-green (#E8EDE4) icon backgrounds, and subtle hover tint — no card shadows — to distinguish it from generic SaaS dashboard patterns.
+
 ---
 
 ## 4. Backend Architecture

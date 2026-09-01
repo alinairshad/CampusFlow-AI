@@ -30,8 +30,8 @@ function StatusBadge({ status }) {
 }
 
 function ProfileCard({ profile, token }) {
-  const [isMentor, setIsMentor]     = useState(profile.is_mentor ?? false)
-  const [toggling, setToggling]     = useState(false)
+  const [isMentor, setIsMentor]       = useState(profile.is_mentor ?? false)
+  const [toggling, setToggling]       = useState(false)
   const [toggleError, setToggleError] = useState('')
 
   async function handleToggle() {
@@ -50,58 +50,62 @@ function ProfileCard({ profile, token }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-      <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
-          <span className="text-lgu-700 text-xl font-bold">{profile.name.charAt(0).toUpperCase()}</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-bold text-gray-900 truncate">{profile.name}</h2>
-          <p className="text-sm text-gray-500 truncate">{profile.email}</p>
-        </div>
-      </div>
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* ID-card accent bar — solid LGU green strip at the top */}
+      <div className="h-2 bg-lgu-700" />
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {[{ label: 'Dept', value: profile.department }, { label: 'Semester', value: profile.semester }, { label: 'Batch', value: profile.batch }].map(({ label, value }) => (
-          <div key={label} className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
-            <span className="font-medium text-gray-500">{label}</span>
-            <span className="text-gray-800">{value}</span>
+      <div className="p-6">
+        {/* Header row: avatar + name/email + LGU crest mark */}
+        <div className="flex items-start gap-4">
+          <div className="w-14 h-14 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
+            <span className="text-lgu-700 text-xl font-bold">{profile.name.charAt(0).toUpperCase()}</span>
           </div>
-        ))}
-      </div>
-
-      {/* Mentor availability toggle */}
-      <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-800">Available as mentor</p>
-          <p className="text-xs text-gray-400 mt-0.5">
-            {isMentor
-              ? 'You appear in the Mentors directory. Fellow students can find and contact you.'
-              : 'Enable to appear in the Mentors directory and help junior students.'}
-          </p>
-          {toggleError && (
-            <p className="text-xs text-red-500 mt-1">{toggleError}</p>
-          )}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-gray-900 truncate">{profile.name}</h2>
+            <p className="text-sm text-gray-500 truncate">{profile.email}</p>
+          </div>
+          {/* LGU crest mark — top-right corner of the card */}
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto opacity-20 shrink-0" />
         </div>
 
-        {/* Toggle switch */}
-        <button
-          onClick={handleToggle}
-          disabled={toggling}
-          aria-pressed={isMentor}
-          aria-label="Toggle mentor availability"
-          className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200
-                       focus:outline-none focus:ring-2 focus:ring-lgu-400 focus:ring-offset-1
-                       disabled:opacity-50
-                       ${isMentor ? 'bg-lgu-700' : 'bg-gray-300'}`}
-        >
-          <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow
-                            transition-transform duration-200
-                            ${isMentor ? 'translate-x-5' : 'translate-x-0'}`} />
-        </button>
-      </div>
+        {/* Dept / Semester / Batch pills */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {[{ label: 'Dept', value: profile.department }, { label: 'Semester', value: profile.semester }, { label: 'Batch', value: profile.batch }].map(({ label, value }) => (
+            <div key={label} className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
+              <span className="font-medium text-gray-500">{label}</span>
+              <span className="text-gray-800">{value}</span>
+            </div>
+          ))}
+        </div>
 
-      <p className="mt-3 text-xs text-gray-400">Member since {formatDate(profile.created_at)}</p>
+        {/* Mentor availability toggle */}
+        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-gray-800">Available as mentor</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {isMentor
+                ? 'You appear in the Mentors directory.'
+                : 'Enable to help junior students.'}
+            </p>
+            {toggleError && <p className="text-xs text-red-500 mt-1">{toggleError}</p>}
+          </div>
+          <button
+            onClick={handleToggle}
+            disabled={toggling}
+            aria-pressed={isMentor}
+            aria-label="Toggle mentor availability"
+            className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200
+                         focus:outline-none focus:ring-2 focus:ring-lgu-400 focus:ring-offset-1
+                         disabled:opacity-50 ${isMentor ? 'bg-lgu-700' : 'bg-gray-300'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow
+                              transition-transform duration-200
+                              ${isMentor ? 'translate-x-5' : 'translate-x-0'}`} />
+          </button>
+        </div>
+
+        <p className="mt-3 text-xs text-gray-400">Member since {formatDate(profile.created_at)}</p>
+      </div>
     </div>
   )
 }
@@ -199,60 +203,43 @@ export default function StudentDashboardPlaceholder() {
         ) : dashboard ? (
           <>
             <ProfileCard profile={dashboard.profile} token={token} />
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: 'Assistant', sub: 'Ask anything', to: '/assistant', icon: 'AI' },
-                { label: 'Applications', sub: 'Letters & forms', to: '/applications', icon: '✉' },
-                { label: 'Directory', sub: 'Offices & contacts', to: '/directory', icon: '🏢' },
-              ].map(({ label, sub, to, icon }) => (
-                <Link key={label} to={to}
-                      className="bg-white rounded-2xl border border-gray-200 p-4 text-center hover:border-lgu-300 hover:shadow-sm transition-all">
-                  <div className="w-10 h-10 rounded-full bg-lgu-100 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-lgu-700 text-sm font-bold">{icon}</span>
-                  </div>
-                  <p className="text-xs font-semibold text-gray-800">{label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
-                </Link>
-              ))}
+
+            {/* Quick-access — unified list-tile layout (Req 14.2–14.4) */}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="divide-y divide-gray-100">
+                {[
+                  { label: 'Assistant',    sub: 'Ask anything',                    to: '/assistant',    icon: '🤖' },
+                  { label: 'Applications', sub: 'Letters & forms',                 to: '/applications', icon: '✉️' },
+                  { label: 'Directory',    sub: 'Offices & contacts',              to: '/directory',    icon: '🏢' },
+                  { label: 'Societies',    sub: 'Clubs, sports, arts & more',      to: '/societies',    icon: '🎓' },
+                  { label: 'Mentors',      sub: 'Find a senior for peer guidance', to: '/mentors',      icon: '🤝' },
+                ].map(({ label, sub, to, icon }) => (
+                  <Link
+                    key={label}
+                    to={to}
+                    className="flex items-center gap-4 px-5 py-4 hover:bg-lgu-50 transition-colors"
+                  >
+                    {/* Icon tile — sage-green background, LGU green icon */}
+                    <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                         style={{ backgroundColor: '#E8EDE4' }}>
+                      <span className="text-lg leading-none" role="img" aria-label={label}>{icon}</span>
+                    </div>
+                    {/* Label + subtitle */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900">{label}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+                    </div>
+                    {/* Chevron */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                         className="w-4 h-4 text-gray-300 shrink-0">
+                      <path fillRule="evenodd"
+                        d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                        clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
             </div>
-            {/* Societies card — full width below the 3-col grid */}
-            <Link to="/societies"
-                  className="bg-white rounded-2xl border border-gray-200 p-4
-                             flex items-center gap-4
-                             hover:border-lgu-300 hover:shadow-sm transition-all">
-              <div className="w-10 h-10 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
-                <span className="text-lgu-700 text-sm font-bold">🎓</span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-800">Societies</p>
-                <p className="text-xs text-gray-400 mt-0.5">Clubs, sports, arts & more</p>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                   className="w-4 h-4 text-gray-400 ml-auto shrink-0">
-                <path fillRule="evenodd"
-                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clipRule="evenodd" />
-              </svg>
-            </Link>
-            {/* Mentors card */}
-            <Link to="/mentors"
-                  className="bg-white rounded-2xl border border-gray-200 p-4
-                             flex items-center gap-4
-                             hover:border-lgu-300 hover:shadow-sm transition-all">
-              <div className="w-10 h-10 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
-                <span className="text-lgu-700 text-sm font-bold">🤝</span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-800">Mentors</p>
-                <p className="text-xs text-gray-400 mt-0.5">Find a senior student for peer guidance</p>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                   className="w-4 h-4 text-gray-400 ml-auto shrink-0">
-                <path fillRule="evenodd"
-                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clipRule="evenodd" />
-              </svg>
-            </Link>
             <RecentApplications applications={dashboard.recent_applications} />
             <RecentConversations conversations={dashboard.recent_conversations} />
           </>
