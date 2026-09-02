@@ -1,6 +1,6 @@
 ﻿import { Link } from 'react-router-dom'
 
-function RoleCard({ icon, label, description, to }) {
+function RoleCard({ icon, label, to }) {
   return (
     <Link
       to={to}
@@ -12,13 +12,7 @@ function RoleCard({ icon, label, description, to }) {
                       flex items-center justify-center transition-colors">
         <span className="text-3xl" role="img" aria-label={label}>{icon}</span>
       </div>
-      <div>
-        <p className="text-base font-bold text-gray-900">{label}</p>
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{description}</p>
-      </div>
-      <span className="text-xs text-lgu-700 group-hover:underline">
-        <strong>Login</strong>
-      </span>
+      <p className="text-base font-bold text-gray-900">{label}</p>
     </Link>
   )
 }
@@ -28,36 +22,20 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
       {/* Branding */}
       <div className="flex flex-col items-center mb-10">
-        <img src="/lgu-logo.png" alt="LGU" className="h-16 w-auto mb-4" />
+        <img src="/lgu-logo.png" alt="LGU" className="h-28 w-auto mb-4" />
         <h1 className="text-2xl font-bold text-lgu-700">CampusFlow AI</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Your intelligent university companion
-        </p>
       </div>
 
       {/* Role picker */}
       <div className="w-full max-w-sm space-y-4">
         <div className="flex gap-4">
-          <RoleCard
-            icon="🎓"
-            label="Student"
-            description="For students"
-            to="/login"
-          />
-          <RoleCard
-            icon="🛡️"
-            label="Admin"
-            description="For administrators"
-            to="/login"
-          />
+          <RoleCard icon="🎓" label="Student" to="/login" />
+          <RoleCard icon="🛡️" label="Admin"   to="/login" />
         </div>
 
-        <p className="text-center text-xs pt-6">
-          <span className="text-gray-400">New student?</span>{' '}
-          <Link
-            to="/register"
-            className="text-lgu-700 font-semibold hover:underline"
-          >
+        <p className="text-center text-sm pt-6 font-bold">
+          <span className="text-gray-500">New student?</span>{' '}
+          <Link to="/register" className="text-lgu-700 hover:underline">
             Register here
           </Link>
         </p>
