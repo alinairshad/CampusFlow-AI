@@ -91,14 +91,16 @@ export default function Navbar() {
   }
 
   return (
-    /* Outer wrapper: full-width row, centers the pill horizontally */
-    <div className="w-full flex justify-center pt-3 pb-0 px-4 shrink-0">
-      <nav className="bg-lgu-100 rounded-full shadow-md px-5 py-2.5
-                      inline-flex items-center gap-6 relative">
+    /* Outer wrapper: row containing the centered pill + sign-out button outside it */
+    <div className="w-full flex items-center justify-center gap-3 pt-4 pb-0 px-4 shrink-0">
 
-        {/* ── Left: logo only ────────────────────────────────────── */}
+      {/* ── Pill ─────────────────────────────────────────────────────── */}
+      <nav className="bg-lgu-100 rounded-full shadow-md px-8 py-3
+                      inline-flex items-center gap-8 relative">
+
+        {/* ── Left: logo only ──────────────────────────────────────── */}
         <div className="flex items-center gap-2 shrink-0">
-          <img src="/lgu-logo.png" alt="LGU" className="h-7 w-auto" />
+          <img src="/lgu-logo.png" alt="LGU" className="h-10 w-auto" />
           {isAdmin && (
             <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
                              px-2 py-0.5 rounded-full hidden sm:inline-block">
@@ -107,9 +109,9 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ── Center: student nav links (desktop md+) ───────────────── */}
+        {/* ── Center: student nav links (desktop md+) ──────────────── */}
         {!isAdmin && (
-          <div className="hidden md:flex items-center gap-5 mx-4">
+          <div className="hidden md:flex items-center gap-6">
             {STUDENT_LINKS.map(({ label, to }) => (
               <NavLink key={to} to={to} className={navLinkClass}>
                 {label}
@@ -118,33 +120,20 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* ── Right: sign out + mobile hamburger ────────────────────── */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Sign out — always visible */}
+        {/* ── Hamburger — student only, mobile only ────────────────── */}
+        {!isAdmin && (
           <button
-            onClick={logout}
-            className="bg-lgu-700 hover:bg-lgu-800 text-white text-xs
-                       font-semibold rounded-full px-4 py-1.5 transition-colors
-                       whitespace-nowrap shadow-sm"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            className="md:hidden p-1 rounded-full text-lgu-700/70
+                       hover:bg-lgu-200 transition-colors"
           >
-            Sign out
+            {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
           </button>
+        )}
 
-          {/* Hamburger — student only, mobile only */}
-          {!isAdmin && (
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={menuOpen}
-              className="md:hidden p-1 rounded-full text-lgu-700/70
-                         hover:bg-lgu-100 transition-colors"
-            >
-              {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
-            </button>
-          )}
-        </div>
-
-        {/* ── Mobile dropdown panel ─────────────────────────────────── */}
+        {/* ── Mobile dropdown panel ──────────────────────────────────── */}
         {menuOpen && !isAdmin && (
           <div
             ref={menuRef}
@@ -171,8 +160,8 @@ export default function Navbar() {
             <div className="border-t border-gray-100 mt-2 pt-2 px-5 pb-1">
               <button
                 onClick={() => { setMenuOpen(false); logout() }}
-                className="w-full text-left text-sm text-red-500
-                           hover:text-red-600 py-1.5 transition-colors"
+                className="w-full text-left text-sm font-bold text-lgu-700
+                           hover:text-lgu-800 py-1.5 transition-colors"
               >
                 Sign out
               </button>
@@ -180,6 +169,17 @@ export default function Navbar() {
           </div>
         )}
       </nav>
+
+      {/* ── Sign out — outside the pill, same row ────────────────────── */}
+      <button
+        onClick={logout}
+        className="bg-lgu-700 hover:bg-lgu-800 text-white text-xs
+                   font-semibold rounded-full px-5 py-3 transition-colors
+                   whitespace-nowrap shadow-sm shrink-0"
+      >
+        Sign out
+      </button>
+
     </div>
   )
 }
