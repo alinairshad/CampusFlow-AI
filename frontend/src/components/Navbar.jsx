@@ -30,8 +30,8 @@ const STUDENT_LINKS = [
 // ---------------------------------------------------------------------------
 function navLinkClass({ isActive }) {
   return isActive
-    ? 'text-xs font-semibold text-lgu-700 underline underline-offset-4 decoration-lgu-700 whitespace-nowrap'
-    : 'text-xs text-lgu-900/60 hover:text-lgu-700 transition-colors whitespace-nowrap'
+    ? 'text-xs font-bold text-lgu-700 underline underline-offset-4 decoration-lgu-700 whitespace-nowrap'
+    : 'text-xs font-bold text-lgu-900/60 hover:text-lgu-700 transition-colors whitespace-nowrap'
 }
 
 // ---------------------------------------------------------------------------
@@ -96,12 +96,9 @@ export default function Navbar() {
       <nav className="bg-lgu-100 rounded-full shadow-md px-5 py-2.5
                       inline-flex items-center gap-6 relative">
 
-        {/* ── Left: logo + wordmark ──────────────────────────────────── */}
+        {/* ── Left: logo only ────────────────────────────────────── */}
         <div className="flex items-center gap-2 shrink-0">
           <img src="/lgu-logo.png" alt="LGU" className="h-7 w-auto" />
-          <span className="text-sm font-bold text-lgu-700 whitespace-nowrap">
-            LGU AI Assistant
-          </span>
           {isAdmin && (
             <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
                              px-2 py-0.5 rounded-full hidden sm:inline-block">
@@ -161,9 +158,9 @@ export default function Navbar() {
                 to={to}
                 onClick={handleLinkClick}
                 className={({ isActive }) =>
-                  `block px-5 py-2.5 text-sm transition-colors ${
+                  `block px-5 py-2.5 text-sm font-bold transition-colors ${
                     isActive
-                      ? 'font-semibold text-lgu-700 bg-lgu-50'
+                      ? 'text-lgu-700 bg-lgu-50'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-lgu-700'
                   }`
                 }

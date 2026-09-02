@@ -29,7 +29,7 @@ export default function LandingPage() {
       {/* Branding */}
       <div className="flex flex-col items-center mb-10">
         <img src="/lgu-logo.png" alt="LGU" className="h-16 w-auto mb-4" />
-        <h1 className="text-2xl font-bold text-lgu-700">LGU AI Assistant</h1>
+        <h1 className="text-2xl font-bold text-lgu-700">CampusFlow AI</h1>
         <p className="text-sm text-gray-500 mt-1">
           Your intelligent university companion
         </p>

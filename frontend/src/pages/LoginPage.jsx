@@ -41,7 +41,7 @@ export default function LoginPage() {
         {/* LGU logo */}
         <div className="flex flex-col items-center mb-6">
           <img src="/lgu-logo.png" alt="LGU" className="h-16 w-auto mb-3" />
-          <h1 className="text-2xl font-bold text-lgu-700">LGU AI Assistant</h1>
+          <h1 className="text-2xl font-bold text-lgu-700">CampusFlow AI</h1>
           <p className="text-gray-500 text-sm mt-1">Login to your account</p>
         </div>
 

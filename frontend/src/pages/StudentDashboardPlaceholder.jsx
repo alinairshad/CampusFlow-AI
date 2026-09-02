@@ -66,7 +66,7 @@ function ProfileCard({ profile, token }) {
             <p className="text-sm text-gray-500 truncate">{profile.email}</p>
           </div>
           {/* LGU crest mark — top-right corner of the card */}
-          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto opacity-20 shrink-0" />
+          <img src="/lgu-logo.png" alt="LGU" className="h-8 w-auto opacity-50 shrink-0" />
         </div>
 
         {/* Dept / Semester / Batch pills */}
