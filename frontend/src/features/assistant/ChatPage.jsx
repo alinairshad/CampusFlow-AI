@@ -244,7 +244,7 @@ export default function ChatPage() {
   const isBlocked = loading || convLoading
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-50">
       <Navbar />
 
       {/* ── Sidebar + chat row ───────────────────────────────────────── */}

@@ -93,8 +93,9 @@ export default function Navbar() {
   return (
     /* Outer wrapper: centers the pill with visible page margin on all sides */
     <div className="w-full px-4 sm:px-8 pt-3 pb-0 shrink-0">
-      <nav className="bg-lgu-100 rounded-full shadow-md px-4 py-2.5
-                      flex items-center justify-between relative">
+      <nav className="bg-lgu-100 rounded-full shadow-md px-5 py-2.5
+                      flex items-center justify-between relative
+                      max-w-5xl mx-auto">
 
         {/* ── Left: logo + wordmark ──────────────────────────────────── */}
         <div className="flex items-center gap-2 shrink-0">
