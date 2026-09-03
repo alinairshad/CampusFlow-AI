@@ -91,16 +91,16 @@ export default function Navbar() {
   }
 
   return (
-    /* Outer wrapper: row containing the centered pill + sign-out button outside it */
-    <div className="w-full flex items-center justify-center gap-3 pt-4 pb-0 px-4 shrink-0">
+    /* Outer wrapper: full-width, pill centered, sign-out pinned to far right */
+    <div className="w-full flex items-center pt-4 pb-0 px-4 shrink-0 relative">
 
-      {/* ── Pill ─────────────────────────────────────────────────────── */}
+      {/* ── Pill — centered in the row ───────────────────────────────── */}
       <nav className="bg-lgu-100 rounded-full shadow-md px-8 py-3
-                      inline-flex items-center gap-8 relative">
+                      inline-flex items-center gap-8 relative mx-auto">
 
         {/* ── Left: logo only ──────────────────────────────────────── */}
         <div className="flex items-center gap-2 shrink-0">
-          <img src="/lgu-logo.png" alt="LGU" className="h-10 w-auto" />
+          <img src="/lgu-logo.png" alt="LGU" className="h-14 w-auto" />
           {isAdmin && (
             <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
                              px-2 py-0.5 rounded-full hidden sm:inline-block">
@@ -170,10 +170,10 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* ── Sign out — outside the pill, same row ────────────────────── */}
+      {/* ── Sign out — absolutely pinned to far right edge ────────────── */}
       <button
         onClick={logout}
-        className="bg-lgu-700 hover:bg-lgu-800 text-white text-xs
+        className="absolute right-4 bg-lgu-700 hover:bg-lgu-800 text-white text-xs
                    font-semibold rounded-full px-5 py-3 transition-colors
                    whitespace-nowrap shadow-sm shrink-0"
       >
