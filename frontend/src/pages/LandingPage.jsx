@@ -47,18 +47,16 @@ export default function LandingPage() {
      * Root: relative + overflow-hidden so the video + overlay stay contained.
      * bg-lgu-800 is the fallback before the video loads or if it fails.
      */
-    <div className="relative min-h-screen bg-lgu-800 flex flex-col
-                    items-center justify-center px-4 py-12 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col
+                    items-center justify-center px-4 py-12 overflow-hidden"
+         style={{ backgroundColor: '#1a2e1a' }}>
 
-      {/* ── Background video ─────────────────────────────────────────── */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/lgu-campus.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
+      {/* ── Background image ─────────────────────────────────────────── */}
+      <img
+        src="/lgu-campus.jpg"
+        alt=""
         aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
       {/* ── Overlay — lighter than before so campus is clearly visible ─ */}
