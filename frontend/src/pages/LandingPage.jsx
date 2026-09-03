@@ -1,9 +1,10 @@
 ﻿import { Link } from 'react-router-dom'
 
-function RoleCard({ icon, label, to }) {
+function RoleCard({ icon, label, to, state }) {
   return (
     <Link
       to={to}
+      state={state}
       className="flex-1 min-w-0 bg-white rounded-2xl border-2 border-gray-200
                  hover:border-lgu-400 hover:shadow-lg transition-all p-8
                  flex flex-col items-center text-center gap-4 group"
@@ -29,8 +30,8 @@ export default function LandingPage() {
       {/* Role picker */}
       <div className="w-full max-w-sm space-y-4">
         <div className="flex gap-4">
-          <RoleCard icon="🎓" label="Student" to="/login" />
-          <RoleCard icon="🛡️" label="Admin"   to="/login" />
+          <RoleCard icon="🎓" label="Student" to="/login" state={{ expectedRole: 'student' }} />
+          <RoleCard icon="🛡️" label="Admin"   to="/login" state={{ expectedRole: 'admin'   }} />
         </div>
 
         <p className="text-center text-sm pt-6 font-bold">
