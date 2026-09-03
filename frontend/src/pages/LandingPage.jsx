@@ -1,39 +1,50 @@
 ﻿import { Link } from 'react-router-dom'
 
 // ---------------------------------------------------------------------------
-// Role card — glassmorphism style, hover lift + scale
+// Role card — refined glassmorphism, per-role icon color
 // ---------------------------------------------------------------------------
-function RoleCard({ icon, label, to, state }) {
+function RoleCard({ icon, label, to, state, iconBg }) {
   return (
     <Link
       to={to}
       state={state}
       className="flex-1 min-w-0 flex flex-col items-center text-center gap-4
-                 rounded-2xl px-6 py-8 cursor-pointer
-                 transition-all duration-300 ease-out
-                 hover:-translate-y-1.5 hover:scale-[1.03]
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                 rounded-2xl px-6 py-8 cursor-pointer group
+                 transition-all duration-250 ease-out
+                 hover:-translate-y-1 hover:scale-[1.025]
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
       style={{
-        background: 'rgba(255,255,255,0.12)',
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
-        border: '1px solid rgba(255,255,255,0.22)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+        background: 'rgba(255,255,255,0.13)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: '1px solid rgba(255,255,255,0.28)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15)',
+        transition: 'transform 250ms ease-out, box-shadow 250ms ease-out, border-color 250ms ease-out, background 250ms ease-out',
       }}
-      // Inline hover shadow handled via onMouseEnter/Leave for the glow —
-      // Tailwind can't easily express box-shadow changes at hover with CSS vars
+      onMouseEnter={e => {
+        e.currentTarget.style.background    = 'rgba(255,255,255,0.19)'
+        e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.42)'
+        e.currentTarget.style.boxShadow     = '0 8px 32px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.20)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background    = 'rgba(255,255,255,0.13)'
+        e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.28)'
+        e.currentTarget.style.boxShadow     = '0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15)'
+      }}
     >
-      {/* Icon circle */}
-      <div className="w-16 h-16 rounded-full flex items-center justify-center
-                      transition-transform duration-300"
-           style={{ background: 'rgba(255,255,255,0.18)' }}>
-        <span className="text-4xl leading-none select-none" role="img" aria-label={label}>
+      {/* Icon circle — per-role tint */}
+      <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+           style={{ background: iconBg, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
+        <span className="text-3xl leading-none select-none" role="img" aria-label={label}>
           {icon}
         </span>
       </div>
 
       {/* Label */}
-      <p className="text-base font-semibold text-white tracking-wide">{label}</p>
+      <p className="text-sm font-semibold text-white/95 tracking-widest uppercase"
+         style={{ textShadow: '0 1px 4px rgba(0,0,0,0.35)' }}>
+        {label}
+      </p>
     </Link>
   )
 }
@@ -90,18 +101,23 @@ export default function LandingPage() {
         </div>
 
         {/* ── Role cards ───────────────────────────────────────────── */}
-        <div className="flex gap-4 w-full mb-8">
+        <div className="flex items-stretch w-full mb-8" style={{ gap: 0 }}>
           <RoleCard
             icon="🎓"
             label="Student"
             to="/login"
             state={{ expectedRole: 'student' }}
+            iconBg="rgba(134,197,134,0.28)"
           />
+          {/* Subtle vertical divider */}
+          <div className="shrink-0 w-px self-stretch mx-3"
+               style={{ background: 'rgba(255,255,255,0.14)' }} />
           <RoleCard
             icon="🛡️"
             label="Admin"
             to="/login"
             state={{ expectedRole: 'admin' }}
+            iconBg="rgba(120,160,210,0.28)"
           />
         </div>
 
