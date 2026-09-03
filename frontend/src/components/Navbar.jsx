@@ -91,25 +91,29 @@ export default function Navbar() {
   }
 
   return (
-    /* Outer wrapper: full-width, pill centered, sign-out pinned to far right */
+    /* Row: logo (far left) — pill (centered) — sign out (far right) */
     <div className="w-full flex items-center pt-4 pb-0 px-4 shrink-0 relative">
 
-      {/* ── Pill — centered in the row ───────────────────────────────── */}
+      {/* ── LGU logo — absolutely pinned to far left ──────────────────── */}
+      <img
+        src="/lgu-logo.png"
+        alt="LGU"
+        className="absolute left-4 h-16 w-auto"
+      />
+
+      {/* ── Pill — nav links only, centered ──────────────────────────── */}
       <nav className="bg-lgu-100 rounded-full shadow-md px-8 py-3
-                      inline-flex items-center gap-8 relative mx-auto">
+                      inline-flex items-center gap-2 relative mx-auto">
 
-        {/* ── Left: logo only ──────────────────────────────────────── */}
-        <div className="flex items-center gap-2 shrink-0">
-          <img src="/lgu-logo.png" alt="LGU" className="h-14 w-auto" />
-          {isAdmin && (
-            <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
-                             px-2 py-0.5 rounded-full hidden sm:inline-block">
-              Admin
-            </span>
-          )}
-        </div>
+        {/* Admin badge — shown inside pill for admin role */}
+        {isAdmin && (
+          <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
+                           px-2 py-0.5 rounded-full hidden sm:inline-block mr-2">
+            Admin
+          </span>
+        )}
 
-        {/* ── Center: student nav links (desktop md+) ──────────────── */}
+        {/* ── Student nav links (desktop md+) ──────────────────────── */}
         {!isAdmin && (
           <div className="hidden md:flex items-center gap-6">
             {STUDENT_LINKS.map(({ label, to }) => (
@@ -170,7 +174,7 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* ── Sign out — absolutely pinned to far right edge ────────────── */}
+      {/* ── Sign out — absolutely pinned to far right ─────────────────── */}
       <button
         onClick={logout}
         className="absolute right-4 bg-lgu-700 hover:bg-lgu-800 text-white text-xs
