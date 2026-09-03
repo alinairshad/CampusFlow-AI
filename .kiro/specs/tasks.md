@@ -224,3 +224,17 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 16.5 Remove `<header>` block from `ChatPage.jsx` (including hamburger sidebar toggle); insert `<Navbar />` as first child of the root flex-col; move sidebar hamburger trigger into `ConversationSidebar` or keep it in the sidebar header — chat layout preserved with `flex flex-1 overflow-hidden` wrapper around sidebar + chat column
 - [ ] 16.6 Remove `<header>` blocks from `DirectoryPage.jsx`, `SocietiesPage.jsx`, `MentorsPage.jsx`, and `ApplicationPage.jsx`; replace each with `<Navbar />`; remove per-page back-arrow links (navbar provides full navigation)
 - [ ] 16.7 Build check — `npm run build` must pass with 0 errors; verify all 7 pages compile cleanly and nav links resolve to correct routes
+
+---
+
+## Stage 17 — Student Dashboard Sidebar Layout Redesign
+*Implements Requirement 17*
+
+- [ ] 17.1 Create `src/features/dashboard/DashboardSidebar.jsx` — fixed left sidebar with CampusFlow AI wordmark, nav items (Dashboard, Assistant, Applications, Directory, Societies, Mentors) with SVG icons, active-link highlight via `useLocation`, Sign out at bottom; mobile overlay drawer with backdrop and slide-in animation; props: `isOpen`, `onClose`, `onSignOut`
+- [ ] 17.2 Rewrite `StudentDashboardPlaceholder.jsx` with sidebar layout: full-height flex row (`DashboardSidebar` + scrollable main column), hamburger in top bar for mobile, `sidebarOpen` state
+- [ ] 17.3 Add WelcomeBanner inline component: `bg-lgu-700 rounded-2xl` card, "Welcome back, {name}!", today's date formatted `toLocaleDateString`, short subtext
+- [ ] 17.4 Add StatsRow inline component: two stat cards derived from `dashboard.recent_applications.length` and `dashboard.recent_conversations.length`, green icon circles
+- [ ] 17.5 Add ApplicationsGrid inline component: 2-column responsive grid of application cards, each showing `type_label`, date, `StatusBadge`, "View →" link to `/applications`; empty state with CTA
+- [ ] 17.6 Add MentorsPanel inline component: fires `listMentors(token)` (or reuses parent-fetched data), shows up to 3 mentor rows (avatar initial, name, department), "See all" → `/mentors`; graceful error/empty fallback
+- [ ] 17.7 Add ConversationsPanel inline component: reuses existing conversation list + polished empty state (chat icon, heading, CTA button to `/assistant`)
+- [ ] 17.8 Verify: sidebar highlights active link, mobile drawer opens/closes correctly, all section data renders, Navbar still works on other pages (Assistant, Directory, etc.), build passes with 0 errors

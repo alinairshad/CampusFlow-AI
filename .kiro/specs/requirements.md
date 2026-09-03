@@ -262,3 +262,22 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 8. WHEN the navbar is built THEN it SHALL be a single reusable `Navbar.jsx` component consumed by all authenticated pages — no per-page duplication of header markup.
 9. WHEN the navbar is added to a page THEN all existing navigation, auth, and routing behaviour SHALL remain exactly as before — this is a visual and structural change only.
 10. WHEN the admin dashboard is viewed THEN the navbar SHALL display an "Admin" role badge alongside the wordmark to distinguish the admin context visually.
+
+---
+
+## Requirement 17: Student Dashboard Redesign — Sidebar Layout
+
+**User Story:** As a student, I want a modern sidebar-navigation dashboard that organises my university information clearly, so that the portal feels like a polished professional product rather than a basic page.
+
+### Acceptance Criteria
+
+1. WHEN a student views the dashboard THEN the layout SHALL have a fixed left sidebar containing the CampusFlow AI wordmark, navigation links (Dashboard, Assistant, Applications, Directory, Societies, Mentors), and a Sign out button at the bottom — replacing the current top Navbar on this page only.
+2. WHEN a student clicks any sidebar nav link THEN the system SHALL navigate to the existing route for that feature without any change to auth, data-fetching, or business logic.
+3. WHEN a sidebar nav item matches the current route THEN the system SHALL visually highlight it (LGU green background or left-border accent).
+4. WHEN the viewport is below the `md` breakpoint THEN the sidebar SHALL collapse and a hamburger icon SHALL appear; tapping it SHALL open a full-height overlay drawer containing the same nav items and Sign out.
+5. WHEN a student views the main content area THEN the system SHALL display a top bar showing the student's name and semester/department, a welcome banner (LGU green background, "Welcome back, {name}!", today's date), a stats row (applications count, conversations count), a Recent Applications section (2-column card grid), a Mentors panel (up to 3 available mentors from GET /mentors), and a Recent Conversations section.
+6. WHEN the student has no applications THEN the Recent Applications section SHALL show a styled empty state with a CTA to generate one.
+7. WHEN the student has no conversations THEN the Recent Conversations section SHALL show the existing polished empty state (chat icon, heading, supporting text, CTA button).
+8. WHEN the Mentors panel is rendered THEN the system SHALL call GET /mentors, display up to 3 results (name + department), and include a "See all" link to /mentors; if the call fails or returns empty the panel SHALL show a graceful fallback message.
+9. WHEN the dashboard data is loading THEN the system SHALL show a spinner; individual section errors SHALL show inline without crashing the whole page.
+10. WHEN the sidebar redesign is applied THEN the Navbar component SHALL still be used on all other authenticated pages (Assistant, Directory, etc.) unchanged — the sidebar is specific to the Student Dashboard only.

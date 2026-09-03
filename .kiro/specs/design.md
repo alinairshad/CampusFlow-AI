@@ -504,3 +504,85 @@ Nav links hidden. A hamburger icon (`☰`) appears in the right area, left of th
 - The entire `<header>…</header>` block
 - The per-page `logout` button
 - The per-page back-arrow link (those arrows become unnecessary because the navbar provides direct links to all sections)
+
+---
+
+## 15. Student Dashboard Redesign — Sidebar Layout
+
+### Overview
+
+The Student Dashboard (`/dashboard`) is redesigned with a left-sidebar layout inspired by modern university portal reference designs. All other pages continue to use the existing `Navbar` component unchanged. No backend changes are required — the redesign is purely a layout and visual restructure of `StudentDashboardPlaceholder.jsx` plus a new `DashboardSidebar.jsx` component.
+
+### Layout Structure
+
+```
+┌──────────────┬──────────────────────────────────────────────┐
+│  Sidebar     │  Top bar (name + semester/dept)               │
+│  w-56        │                                               │
+│  ─────────   │  Welcome banner (green, full-width)           │
+│  Logo        │                                               │
+│  ─────────   │  Stats row  [Apps: N]  [Chats: N]             │
+│  Dashboard ◀ │                                               │
+│  Assistant   │  ┌──────────┐  ┌──────────┐  Recent Convs    │
+│  Applications│  │ App card │  │ App card │  ─────────────   │
+│  Directory   │  └──────────┘  └──────────┘  [conv item]     │
+│  Societies   │                               [conv item]     │
+│  Mentors     │  Mentors panel                               │
+│              │  [avatar] Name · Dept    See all →           │
+│  ─────────   │                                               │
+│  Sign out    │                                               │
+└──────────────┴──────────────────────────────────────────────┘
+```
+
+On mobile (`< md`): sidebar hidden, hamburger in top bar opens overlay drawer.
+
+### Components
+
+```
+StudentDashboardPlaceholder.jsx   — page root, owns all data-fetching state
+  DashboardSidebar.jsx            — presentational, props: isOpen, onClose, onSignOut
+  ┌── Top bar
+  ├── WelcomeBanner               — inline, profile.name + today's date
+  ├── StatsRow                    — inline, derived counts from dashboard data
+  ├── ApplicationsGrid            — inline, 2-col card grid from recent_applications
+  ├── MentorsPanel                — inline, up to 3 from GET /mentors
+  └── ConversationsPanel          — inline, list from recent_conversations
+```
+
+### DashboardSidebar props
+
+| Prop | Type | Purpose |
+|---|---|---|
+| `isOpen` | boolean | mobile drawer open state |
+| `onClose` | () => void | close mobile drawer |
+| `onSignOut` | () => void | calls logout() |
+
+The sidebar reads `location.pathname` via `useLocation()` internally for active-link detection.
+
+### Sidebar visual style
+
+- Desktop: `w-56 shrink-0 h-screen sticky top-0` — LGU green (`bg-lgu-700`) background, white text
+- Nav items: `text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 rounded-lg px-3 py-2.5`
+- Active item: `bg-white/15 text-white font-semibold` + `border-l-2 border-white` left accent
+- Sign out: at bottom of sidebar, `text-white/60 hover:text-white`
+- Mobile: `fixed inset-y-0 left-0 z-40 w-56 bg-lgu-700`, backdrop `bg-black/40`, slide-in `translate-x-0`
+
+### Main content area
+
+- **Top bar**: `bg-white border-b border-gray-100 px-6 py-3` — student name `font-semibold`, dept/semester `text-sm text-gray-400`; hamburger at left on mobile
+- **Welcome banner**: `bg-lgu-700 rounded-2xl px-6 py-5 text-white` — "Welcome back, {name}!" `text-2xl font-bold` + date + one-line subtext
+- **Stats row**: two `bg-white rounded-xl border` cards — Applications (count from `recent_applications.length` + total if available) and Conversations (from `recent_conversations.length`); green accent icon circle
+- **Recent Applications**: section heading + "See all" link + 2-col grid (`grid-cols-1 sm:grid-cols-2`); each card shows `type_label`, `formatDate`, `StatusBadge`, and a "View" button linking to `/applications`
+- **Mentors panel**: section heading + "See all" → `/mentors`; up to 3 mentor rows — avatar initial circle, name `font-semibold`, department `text-xs text-gray-400`
+- **Recent Conversations**: existing `ConversationsPanel` component reused verbatim, styled as card list
+
+### Data fetching
+
+`StudentDashboardPlaceholder` fires two parallel fetches on mount:
+1. `getStudentDashboard(token)` — existing call, unchanged
+2. `listMentors(token)` — new call, result stored in `mentors` state; failures stored in `mentorError` (non-fatal)
+
+### Responsive behaviour
+
+- `md+`: sidebar always visible, main content fills remaining width
+- `< md`: sidebar hidden, hamburger in top bar, full-height overlay drawer on open
