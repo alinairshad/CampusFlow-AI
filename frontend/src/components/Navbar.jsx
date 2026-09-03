@@ -94,12 +94,10 @@ export default function Navbar() {
     /* Row: logo (far left) — pill (centered) — sign out (far right) */
     <div className="w-full flex items-center py-4 px-5 shrink-0 relative">
 
-      {/* ── LGU logo — pinned far left, bare image ─────────────────── */}
-      <img
-        src="/lgu-logo.png"
-        alt="LGU"
-        className="absolute left-5 h-14 w-auto drop-shadow-sm"
-      />
+      {/* ── "CampusFlow AI" wordmark — pinned far left ───────────────── */}
+      <span className="absolute left-5 text-xl font-bold text-lgu-700 whitespace-nowrap">
+        CampusFlow AI
+      </span>
 
       {/* ── Pill — nav links only, centered ──────────────────────────── */}
       <nav className="bg-white rounded-2xl shadow-sm border border-gray-200
