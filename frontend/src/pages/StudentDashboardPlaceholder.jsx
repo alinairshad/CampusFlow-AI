@@ -51,53 +51,64 @@ function ProfileCard({ profile, token }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* ID-card accent bar — solid LGU green strip at the top */}
-      <div className="h-2 bg-lgu-700" />
-
+    <div className="animate-fade-in-up rounded-2xl overflow-hidden shadow-md
+                    hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200
+                    bg-gradient-to-br from-lgu-700 to-lgu-900">
       <div className="p-6">
-        {/* Header row: avatar + name/email + LGU crest mark */}
+        {/* Header row: avatar + name/email + LGU crest badge */}
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-full bg-lgu-100 flex items-center justify-center shrink-0">
-            <span className="text-lgu-700 text-xl font-bold">{profile.name.charAt(0).toUpperCase()}</span>
+          {/* Avatar */}
+          <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <span className="text-white text-xl font-bold">{profile.name.charAt(0).toUpperCase()}</span>
           </div>
+          {/* Name / email */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-gray-900 truncate">{profile.name}</h2>
-            <p className="text-sm text-gray-500 truncate">{profile.email}</p>
+            <h2 className="text-lg font-bold text-white truncate">{profile.name}</h2>
+            <p className="text-sm text-green-100 truncate">{profile.email}</p>
           </div>
-          {/* LGU crest mark — top-right corner of the card */}
-          <img src="/lgu-logo.png" alt="LGU" className="h-16 w-auto opacity-50 shrink-0" />
+          {/* LGU crest — white circular badge, pops against green */}
+          <div className="shrink-0 bg-white rounded-full p-1.5 shadow-md">
+            <img src="/lgu-logo.png" alt="LGU" className="h-10 w-10 object-contain" />
+          </div>
         </div>
 
         {/* Dept / Semester / Batch pills */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {[{ label: 'Dept', value: profile.department }, { label: 'Semester', value: profile.semester }, { label: 'Batch', value: profile.batch }].map(({ label, value }) => (
-            <div key={label} className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-200 rounded-full px-3 py-1">
-              <span className="font-medium text-gray-500">{label}</span>
-              <span className="text-gray-800">{value}</span>
+          {[
+            { label: 'Dept',     value: profile.department },
+            { label: 'Semester', value: profile.semester   },
+            { label: 'Batch',    value: profile.batch      },
+          ].map(({ label, value }) => (
+            <div key={label}
+                 className="flex items-center gap-1.5 text-xs rounded-full px-3 py-1
+                            bg-white/15 text-white backdrop-blur-sm">
+              <span className="font-medium opacity-70">{label}</span>
+              <span>{value}</span>
             </div>
           ))}
         </div>
 
         {/* Mentor availability toggle */}
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+        <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-800">Available as mentor</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-sm font-medium text-white">Available as mentor</p>
+            <p className="text-xs text-green-200 mt-0.5">
               {isMentor
                 ? 'You appear in the Mentors directory.'
                 : 'Enable to help junior students.'}
             </p>
-            {toggleError && <p className="text-xs text-red-500 mt-1">{toggleError}</p>}
+            {toggleError && <p className="text-xs text-red-300 mt-1">{toggleError}</p>}
           </div>
+          {/* Toggle — white track when off, lgu-green glow when on */}
           <button
             onClick={handleToggle}
             disabled={toggling}
             aria-pressed={isMentor}
             aria-label="Toggle mentor availability"
             className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200
-                         focus:outline-none focus:ring-2 focus:ring-lgu-400 focus:ring-offset-1
-                         disabled:opacity-50 ${isMentor ? 'bg-lgu-700' : 'bg-gray-300'}`}
+                        focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1
+                        focus:ring-offset-lgu-800 disabled:opacity-50
+                        ${isMentor ? 'bg-lgu-400' : 'bg-white/30'}`}
           >
             <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow
                               transition-transform duration-200
@@ -105,7 +116,7 @@ function ProfileCard({ profile, token }) {
           </button>
         </div>
 
-        <p className="mt-3 text-xs text-gray-400">Member since {formatDate(profile.created_at)}</p>
+        <p className="mt-3 text-xs text-green-200">Member since {formatDate(profile.created_at)}</p>
       </div>
     </div>
   )
@@ -200,7 +211,8 @@ export default function StudentDashboardPlaceholder() {
             <ProfileCard profile={dashboard.profile} token={token} />
 
             {/* Quick-access — unified list-tile layout (Req 14.2–14.4) */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden
+                            animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               <div className="divide-y divide-gray-100">
                 {[
                   { label: 'Assistant',    sub: 'Ask anything',                    to: '/assistant',    icon: '🤖' },
@@ -208,16 +220,20 @@ export default function StudentDashboardPlaceholder() {
                   { label: 'Directory',    sub: 'Offices & contacts',              to: '/directory',    icon: '🏢' },
                   { label: 'Societies',    sub: 'Clubs, sports, arts & more',      to: '/societies',    icon: '🎓' },
                   { label: 'Mentors',      sub: 'Find a senior for peer guidance', to: '/mentors',      icon: '🤝' },
-                ].map(({ label, sub, to, icon }) => (
+                ].map(({ label, sub, to, icon }, idx) => (
                   <Link
                     key={label}
                     to={to}
-                    className="flex items-center gap-4 px-5 py-4 hover:bg-lgu-50 transition-colors"
+                    className="group flex items-center gap-4 px-5 py-4 hover:bg-lgu-50 transition-colors
+                               animate-fade-in-up"
+                    style={{ animationDelay: `${0.15 + idx * 0.06}s` }}
                   >
-                    {/* Icon tile — sage-green background, LGU green icon */}
+                    {/* Icon tile — sage-green background, scales up on hover */}
                     <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                          style={{ backgroundColor: '#E8EDE4' }}>
-                      <span className="text-lg leading-none" role="img" aria-label={label}>{icon}</span>
+                      <span className="text-lg leading-none transition-transform duration-200
+                                       group-hover:scale-110 inline-block"
+                            role="img" aria-label={label}>{icon}</span>
                     </div>
                     {/* Label + subtitle */}
                     <div className="flex-1 min-w-0">
