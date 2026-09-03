@@ -14,7 +14,7 @@ function RoleCard({ icon, label, to, state, iconBg }) {
                  hover:-translate-y-1 hover:scale-[1.025]
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
       style={{
-        background: 'rgba(255,255,255,0.13)',
+        background: 'rgba(255,255,255,0.96)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         border: '1px solid rgba(255,255,255,0.28)',
@@ -22,12 +22,12 @@ function RoleCard({ icon, label, to, state, iconBg }) {
         transition: 'transform 250ms ease-out, box-shadow 250ms ease-out, border-color 250ms ease-out, background 250ms ease-out',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background    = 'rgba(255,255,255,0.19)'
+        e.currentTarget.style.background    = 'rgba(255,255,255,1)'
         e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.42)'
         e.currentTarget.style.boxShadow     = '0 8px 32px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.20)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background    = 'rgba(255,255,255,0.13)'
+        e.currentTarget.style.background    = 'rgba(255,255,255,0.96)'
         e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.28)'
         e.currentTarget.style.boxShadow     = '0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15)'
       }}
@@ -41,8 +41,8 @@ function RoleCard({ icon, label, to, state, iconBg }) {
       </div>
 
       {/* Label */}
-      <p className="text-sm font-semibold text-white/95 tracking-widest uppercase"
-         style={{ textShadow: '0 1px 4px rgba(0,0,0,0.35)' }}>
+      <p className="text-sm font-semibold text-gray-800 tracking-widest uppercase"
+         style={{ textShadow: 'none' }}>
         {label}
       </p>
     </Link>
