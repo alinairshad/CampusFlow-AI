@@ -30,8 +30,8 @@ const STUDENT_LINKS = [
 // ---------------------------------------------------------------------------
 function navLinkClass({ isActive }) {
   return isActive
-    ? 'text-xs font-bold text-lgu-700 underline underline-offset-4 decoration-lgu-700 whitespace-nowrap'
-    : 'text-xs font-bold text-lgu-900/60 hover:text-lgu-700 transition-colors whitespace-nowrap'
+    ? 'text-sm font-semibold text-lgu-700 bg-lgu-50 px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors'
+    : 'text-sm font-medium text-gray-500 hover:text-lgu-700 hover:bg-gray-50 px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors'
 }
 
 // ---------------------------------------------------------------------------
@@ -92,30 +92,30 @@ export default function Navbar() {
 
   return (
     /* Row: logo (far left) — pill (centered) — sign out (far right) */
-    <div className="w-full flex items-center pt-4 pb-0 px-4 shrink-0 relative">
+    <div className="w-full flex items-center py-4 px-5 shrink-0 relative">
 
-      {/* ── LGU logo — absolutely pinned to far left ──────────────────── */}
+      {/* ── LGU logo — pinned far left, bare image ─────────────────── */}
       <img
         src="/lgu-logo.png"
         alt="LGU"
-        className="absolute left-4 h-16 w-auto"
+        className="absolute left-5 h-14 w-auto drop-shadow-sm"
       />
 
       {/* ── Pill — nav links only, centered ──────────────────────────── */}
-      <nav className="bg-lgu-100 rounded-full shadow-md px-8 py-3
-                      inline-flex items-center gap-2 relative mx-auto">
+      <nav className="bg-white rounded-2xl shadow-sm border border-gray-200
+                      px-8 py-3 inline-flex items-center gap-1 relative mx-auto">
 
-        {/* Admin badge — shown inside pill for admin role */}
+        {/* Admin badge */}
         {isAdmin && (
-          <span className="text-xs bg-lgu-200 text-lgu-800 font-semibold
-                           px-2 py-0.5 rounded-full hidden sm:inline-block mr-2">
+          <span className="text-xs bg-lgu-100 text-lgu-700 font-semibold
+                           px-2.5 py-0.5 rounded-full hidden sm:inline-block mr-2">
             Admin
           </span>
         )}
 
         {/* ── Student nav links (desktop md+) ──────────────────────── */}
         {!isAdmin && (
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-1">
             {STUDENT_LINKS.map(({ label, to }) => (
               <NavLink key={to} to={to} className={navLinkClass}>
                 {label}
@@ -124,20 +124,20 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* ── Hamburger — student only, mobile only ────────────────── */}
+        {/* ── Hamburger — mobile only ──────────────────────────────── */}
         {!isAdmin && (
           <button
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
-            className="md:hidden p-1 rounded-full text-lgu-700/70
-                       hover:bg-lgu-200 transition-colors"
+            className="md:hidden p-1.5 rounded-xl text-gray-500
+                       hover:bg-lgu-50 hover:text-lgu-700 transition-colors"
           >
             {menuOpen ? <CloseIcon /> : <HamburgerIcon />}
           </button>
         )}
 
-        {/* ── Mobile dropdown panel ──────────────────────────────────── */}
+        {/* ── Mobile dropdown ───────────────────────────────────────── */}
         {menuOpen && !isAdmin && (
           <div
             ref={menuRef}
@@ -151,10 +151,10 @@ export default function Navbar() {
                 to={to}
                 onClick={handleLinkClick}
                 className={({ isActive }) =>
-                  `block px-5 py-2.5 text-sm font-bold transition-colors ${
+                  `block px-5 py-2.5 text-sm transition-colors ${
                     isActive
-                      ? 'text-lgu-700 bg-lgu-50'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-lgu-700'
+                      ? 'font-semibold text-lgu-700 bg-lgu-50'
+                      : 'font-medium text-gray-600 hover:bg-gray-50 hover:text-lgu-700'
                   }`
                 }
               >
@@ -164,8 +164,8 @@ export default function Navbar() {
             <div className="border-t border-gray-100 mt-2 pt-2 px-5 pb-1">
               <button
                 onClick={() => { setMenuOpen(false); logout() }}
-                className="w-full text-left text-sm font-bold text-lgu-700
-                           hover:text-lgu-800 py-1.5 transition-colors"
+                className="w-full text-left text-sm font-medium text-gray-500
+                           hover:text-lgu-700 py-1.5 transition-colors"
               >
                 Sign out
               </button>
@@ -174,12 +174,12 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* ── Sign out — absolutely pinned to far right ─────────────────── */}
+      {/* ── Sign out — pinned far right ────────────────────────────── */}
       <button
         onClick={logout}
-        className="absolute right-4 bg-lgu-700 hover:bg-lgu-800 text-white text-xs
-                   font-semibold rounded-full px-5 py-3 transition-colors
-                   whitespace-nowrap shadow-sm shrink-0"
+        className="absolute right-5 bg-lgu-700 hover:bg-lgu-600 text-white
+                   text-sm font-medium rounded-xl px-5 py-2.5 transition-all
+                   whitespace-nowrap shadow-sm hover:shadow-md shrink-0"
       >
         Sign out
       </button>
