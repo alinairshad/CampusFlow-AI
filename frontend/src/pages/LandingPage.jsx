@@ -95,7 +95,8 @@ export default function LandingPage() {
               style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
             CampusFlow AI
           </h1>
-          <p className="text-sm sm:text-base text-white/70 mt-2 font-medium tracking-wide">
+          <p className="text-sm sm:text-base text-white font-medium tracking-wide"
+             style={{ textShadow: '0 1px 8px rgba(0,0,0,0.7), 0 0px 2px rgba(0,0,0,0.9)' }}>
             Your smarter campus experience.
           </p>
         </div>
