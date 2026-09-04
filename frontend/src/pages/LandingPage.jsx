@@ -14,7 +14,7 @@ function RoleCard({ icon, label, to, state, iconBg }) {
                  hover:-translate-y-1 hover:scale-[1.025]
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
       style={{
-        background: 'rgba(232,245,233,0.45)',
+        background: 'rgba(232,245,233,0.72)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
         border: '1px solid rgba(200,230,201,0.60)',
@@ -23,11 +23,11 @@ function RoleCard({ icon, label, to, state, iconBg }) {
         transition: 'transform 250ms ease-out, box-shadow 250ms ease-out, background 250ms ease-out',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(232,245,233,0.62)'
+        e.currentTarget.style.background = 'rgba(232,245,233,0.85)'
         e.currentTarget.style.boxShadow  = '0 8px 32px rgba(0,0,0,0.18)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = 'rgba(232,245,233,0.45)'
+        e.currentTarget.style.background = 'rgba(232,245,233,0.72)'
         e.currentTarget.style.boxShadow  = '0 4px 24px rgba(0,0,0,0.12)'
       }}
     >
@@ -69,9 +69,10 @@ export default function LandingPage() {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* ── Overlay — lighter than before so campus is clearly visible ─ */}
+      {/* ── Overlay — vignette on edges only, center stays bright
+              so the light-green cards composite over the actual photo ─ */}
       <div className="absolute inset-0" aria-hidden="true"
-           style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.52) 100%)' }} />
+           style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.10) 35%, rgba(0,0,0,0.10) 65%, rgba(0,0,0,0.50) 100%)' }} />
 
       {/* ── Main content ─────────────────────────────────────────────── */}
       <div className="relative z-10 w-full max-w-sm mx-auto flex flex-col items-center">
