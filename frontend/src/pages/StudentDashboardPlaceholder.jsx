@@ -205,14 +205,14 @@ function ProfileCard({ profile, token }) {
         {/* Mentor toggle */}
         <div className="pt-3 border-t border-gray-50 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-gray-700 leading-tight">Mentor</p>
+            <p className="text-xs font-semibold text-gray-700 leading-tight">Senior</p>
             <p className="text-xs text-gray-400 mt-0.5 leading-tight">
               {isMentor ? 'Visible in directory' : 'Help juniors'}
             </p>
             {toggleError && <p className="text-xs text-red-500 mt-1">{toggleError}</p>}
           </div>
           <button onClick={handleToggle} disabled={toggling} aria-pressed={isMentor}
-                  aria-label="Toggle mentor availability"
+                  aria-label="Toggle senior availability"
                   style={{ height: '1.375rem' }}
                   className={`relative shrink-0 w-10 rounded-full transition-all duration-300 cursor-pointer
                               focus:outline-none focus:ring-2 focus:ring-lgu-300 focus:ring-offset-1
@@ -280,7 +280,7 @@ const QUICK_ACTIONS = [
     ),
   },
   {
-    label: 'Find a Mentor',
+    label: 'Find a Senior',
     sub: 'Peer guidance',
     to: '/mentors',
     primary: false,
@@ -390,16 +390,16 @@ function MentorsPanel({ mentors, error }) {
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden
                     animate-fade-in-up" style={{ animationDelay: '0.24s' }}>
       <div className="px-4 py-3.5 border-b border-gray-50 flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Mentors</h2>
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Seniors</h2>
         <Link to="/mentors" className="text-xs font-medium text-lgu-600 hover:text-lgu-700 hover:underline transition-colors">
           See all →
         </Link>
       </div>
       {error ? (
-        <p className="px-4 py-5 text-xs text-gray-400">Could not load mentors.</p>
+        <p className="px-4 py-5 text-xs text-gray-400">Could not load seniors.</p>
       ) : mentors.length === 0 ? (
         <div className="px-4 py-5">
-          <p className="text-xs text-gray-400">No mentors available yet.</p>
+          <p className="text-xs text-gray-400">No seniors available yet.</p>
           <Link to="/mentors" className="text-xs text-lgu-600 hover:underline">Check the directory</Link>
         </div>
       ) : (

@@ -108,7 +108,7 @@ export default function MentorsPage() {
         setDisplayed(data.mentors)
       } catch (err) {
         const detail = err.response?.data?.detail
-        setError(typeof detail === 'string' ? detail : 'Failed to load mentors.')
+        setError(typeof detail === 'string' ? detail : 'Failed to load seniors.')
       } finally {
         setLoading(false)
       }
@@ -148,7 +148,7 @@ export default function MentorsPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-5">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Mentor Directory</h1>
+          <h1 className="text-xl font-bold text-gray-900">Senior Directory</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Find senior students available for peer guidance. Contact them directly via email.
           </p>
@@ -207,8 +207,8 @@ export default function MentorsPage() {
           <div className="text-center py-12 space-y-2">
             <p className="text-sm text-gray-400">
               {searchQ || department
-                ? 'No mentors match your filters.'
-                : 'No mentors available yet.'}
+                ? 'No seniors match your filters.'
+                : 'No seniors available yet.'}
             </p>
             {!searchQ && !department && (
               <p className="text-xs text-gray-400">
