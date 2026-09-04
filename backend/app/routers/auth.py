@@ -65,6 +65,7 @@ async def register(body: UserRegisterRequest):
         "department": body.department,
         "semester": body.semester,
         "batch": body.batch,
+        "roll_number": body.roll_number,  # validated LGU roll number (req 18)
         "interests": [],
         "created_at": now,
     }

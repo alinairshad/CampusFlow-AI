@@ -586,3 +586,49 @@ The sidebar reads `location.pathname` via `useLocation()` internally for active-
 
 - `md+`: sidebar always visible, main content fills remaining width
 - `< md`: sidebar hidden, hamburger in top bar, full-height overlay drawer on open
+
+---
+
+## 16. LGU Roll Number Format Validation
+
+### Overview
+
+A lightweight format-only check added to the student registration flow. No access to LGU's live student records — this is a regex gate that filters obviously invalid input.
+
+### Regex
+
+```
+^(Fa|Sp|Su)-\d{2}/[A-Z][A-Za-z\-]{1,9}/\d{1,4}-[A-Z]$
+```
+
+| Component | Pattern | Examples |
+|---|---|---|
+| Semester prefix | `(Fa\|Sp\|Su)` | Fa, Sp, Su |
+| Year | `-\d{2}` | -23, -24, -26 |
+| Programme code | `/[A-Z][A-Za-z\-]{1,9}` | /BSSE, /BS-CySec, /BBA |
+| Roll number | `/\d{1,4}` | /199, /007 |
+| Section | `-[A-Z]` | -D, -A, -F |
+
+Valid examples: `Fa-23/BSSE/199-D`, `Sp-24/BSCS/001-A`, `Fa-23/BS-CySec/12-C`
+
+### Backend changes
+
+**`app/models/user.py`**
+- `UserRegisterRequest`: add `roll_number: str` field + `roll_number_format` validator using the regex above; raise `ValueError` with human-readable message including a format example.
+- `StudentProfileInDB`: add `roll_number: Optional[str] = None` (Optional so existing documents without the field don't break).
+- `StudentProfileResponse`: add `roll_number: Optional[str] = None`.
+
+**`app/routers/auth.py`** (`POST /auth/register`)
+- Pass `roll_number=body.roll_number` into `profile_doc` when inserting.
+
+### Frontend changes
+
+**`RegisterPage.jsx`**
+- Add a "Roll Number" text input between the existing Batch field and the submit button.
+- Placeholder: `Fa-23/BSSE/199-D`
+- Below the input: `<p class="hint">Format: Fa-23/BSSE/199-D</p>` — always visible as guidance.
+- Client-side: no separate regex validation on the frontend — let the backend 422 flow through and display the `detail` string, which is already wired up.
+
+### Backward compatibility
+
+`roll_number` is `Optional[str] = None` on both `StudentProfileInDB` and `StudentProfileResponse`. Existing student documents in MongoDB have no `roll_number` key — they will deserialise to `None` without error.

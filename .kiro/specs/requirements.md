@@ -281,3 +281,20 @@ This document defines the requirements for the MVP scope: AI Campus Assistant, P
 8. WHEN the Mentors panel is rendered THEN the system SHALL call GET /mentors, display up to 3 results (name + department), and include a "See all" link to /mentors; if the call fails or returns empty the panel SHALL show a graceful fallback message.
 9. WHEN the dashboard data is loading THEN the system SHALL show a spinner; individual section errors SHALL show inline without crashing the whole page.
 10. WHEN the sidebar redesign is applied THEN the Navbar component SHALL still be used on all other authenticated pages (Assistant, Directory, etc.) unchanged — the sidebar is specific to the Student Dashboard only.
+
+---
+
+## Requirement 18: LGU Roll Number Format Validation at Registration
+
+**User Story:** As a university administrator, I want student registrations to include a valid LGU roll number so that obviously invalid or non-LGU registrations are filtered out at the point of sign-up.
+
+### Acceptance Criteria
+
+1. WHEN a student submits the registration form THEN the system SHALL require a "Roll Number" field in addition to the existing fields.
+2. WHEN the roll number is submitted THEN the backend SHALL validate it against the pattern `(Fa|Sp|Su)-YY/PROGRAM/NUMBER-SECTION` (e.g. `Fa-23/BSSE/199-D`) and reject with HTTP 422 and a descriptive error message if it does not match.
+3. WHEN the roll number is invalid THEN the frontend SHALL display an inline error with an example of the correct format (e.g. "e.g. Fa-23/BSSE/199-D").
+4. WHEN the roll number is valid and registration succeeds THEN the roll number SHALL be stored on the student's profile in the `student_profiles` collection.
+5. WHEN the student's profile is retrieved THEN the roll number SHALL be included in the `StudentProfileResponse`.
+6. WHEN validation fails THEN the system SHALL return a single clear error string, not a raw Pydantic validation dump, so the frontend can display it directly.
+7. WHEN an admin account is created (via seed script) THEN the roll number field SHALL NOT be required — it applies to student registration only.
+8. WHEN an existing student registered without a roll number logs in THEN the system SHALL NOT break — `roll_number` is stored as `Optional` on existing profiles (null for pre-existing accounts).

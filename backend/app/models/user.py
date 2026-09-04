@@ -6,6 +6,7 @@ Covers:
 - Request bodies (UserRegisterRequest, UserLoginRequest, StudentProfileUpdateRequest)
 - Response shapes (TokenResponse, StudentProfileResponse)
 """
+import re
 from datetime import datetime
 from typing import Literal, Optional
 
@@ -37,6 +38,7 @@ class StudentProfileInDB(BaseModel):
     department: str
     semester: str
     batch: str
+    roll_number: Optional[str] = None  # LGU roll number, e.g. Fa-23/BSSE/199-D (req 18)
     interests: list[str] = []
     is_mentor: bool = False            # student opts in to mentor directory (req 13.1)
     created_at: datetime
@@ -48,6 +50,10 @@ class StudentProfileInDB(BaseModel):
 # Request bodies
 # ---------------------------------------------------------------------------
 
+_ROLL_NUMBER_RE = re.compile(
+    r'^(Fa|Sp|Su)-\d{2}/[A-Z][A-Za-z\-]{1,9}/\d{1,4}-[A-Z]$'
+)
+
 class UserRegisterRequest(BaseModel):
     """Body accepted by POST /auth/register."""
     name: str
@@ -56,6 +62,7 @@ class UserRegisterRequest(BaseModel):
     department: str
     semester: str
     batch: str
+    roll_number: str  # e.g. Fa-23/BSSE/199-D (req 18)
 
     @field_validator("password")
     @classmethod
@@ -74,6 +81,18 @@ class UserRegisterRequest(BaseModel):
         if not v.strip():
             raise ValueError("Name must not be blank.")
         return v.strip()
+
+    @field_validator("roll_number")
+    @classmethod
+    def roll_number_format(cls, v: str) -> str:
+        v = v.strip()
+        if not _ROLL_NUMBER_RE.match(v):
+            raise ValueError(
+                "Invalid roll number format. "
+                "Expected format: Fa-23/BSSE/199-D "
+                "(semester prefix Fa/Sp/Su, 2-digit year, programme code, number, section letter)."
+            )
+        return v
 
 
 class UserLoginRequest(BaseModel):
@@ -127,6 +146,7 @@ class StudentProfileResponse(BaseModel):
     department: str
     semester: str
     batch: str
+    roll_number: Optional[str] = None  # LGU roll number (req 18); None for pre-existing accounts
     interests: list[str] = []
     is_mentor: bool = False            # whether this student is in the mentor directory
 

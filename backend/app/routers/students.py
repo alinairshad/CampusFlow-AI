@@ -54,6 +54,7 @@ def _build_profile_response(user: dict, profile: dict) -> StudentProfileResponse
         department=profile["department"],
         semester=profile["semester"],
         batch=profile["batch"],
+        roll_number=profile.get("roll_number"),       # None for pre-existing accounts (req 18)
         interests=profile.get("interests", []),
         is_mentor=profile.get("is_mentor", False),
     )

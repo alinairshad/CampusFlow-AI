@@ -238,3 +238,13 @@ This plan breaks the MVP into small, sequential, trackable tasks. Each task refe
 - [ ] 17.6 Add MentorsPanel inline component: fires `listMentors(token)` (or reuses parent-fetched data), shows up to 3 mentor rows (avatar initial, name, department), "See all" → `/mentors`; graceful error/empty fallback
 - [ ] 17.7 Add ConversationsPanel inline component: reuses existing conversation list + polished empty state (chat icon, heading, CTA button to `/assistant`)
 - [ ] 17.8 Verify: sidebar highlights active link, mobile drawer opens/closes correctly, all section data renders, Navbar still works on other pages (Assistant, Directory, etc.), build passes with 0 errors
+
+---
+
+## Stage 18 — LGU Roll Number Format Validation
+*Implements Requirement 18*
+
+- [ ] 18.1 Add `roll_number: str` to `UserRegisterRequest` in `app/models/user.py` with a `roll_number_format` Pydantic `field_validator` using regex `^(Fa|Sp|Su)-\d{2}/[A-Z][A-Za-z\-]{1,9}/\d{1,4}-[A-Z]$`; add `roll_number: Optional[str] = None` to `StudentProfileInDB` and `StudentProfileResponse`
+- [ ] 18.2 Update `POST /auth/register` in `app/routers/auth.py` to include `roll_number=body.roll_number` in `profile_doc`
+- [ ] 18.3 Add Roll Number input field to `RegisterPage.jsx` (between Batch and submit button); placeholder `Fa-23/BSSE/199-D`; static format hint below the field
+- [ ] 18.4 Verify: POST `/auth/register` with a valid roll number → 201; with an invalid roll number → 422 with a clear message; frontend shows the error inline; existing login flow still works

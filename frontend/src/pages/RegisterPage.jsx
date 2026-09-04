@@ -6,7 +6,7 @@ export default function RegisterPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     name: '', email: '', password: '',
-    department: '', semester: '', batch: '',
+    department: '', semester: '', batch: '', roll_number: '',
   })
   const [error,   setError]   = useState('')
   const [loading, setLoading] = useState(false)
@@ -128,6 +128,20 @@ export default function RegisterPage() {
               <input type="text" name="batch" value={form.batch}
                      onChange={handleChange} required
                      className={inputCls} placeholder="2023" />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                Roll Number
+              </label>
+              <input type="text" name="roll_number" value={form.roll_number}
+                     onChange={handleChange} required
+                     className={inputCls} placeholder="Fa-23/BSSE/199-D"
+                     autoComplete="off" spellCheck="false" />
+              <p className="mt-1.5 text-xs text-gray-400">
+                Format: <span className="font-medium text-gray-500">Fa-23/BSSE/199-D</span>
+                {' '}(semester/programme/number-section)
+              </p>
             </div>
 
             {error && (
