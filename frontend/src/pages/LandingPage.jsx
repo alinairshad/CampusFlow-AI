@@ -14,20 +14,20 @@ function RoleCard({ icon, label, to, state, iconBg }) {
                  hover:-translate-y-1 hover:scale-[1.025]
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
       style={{
-        background: 'rgba(255,255,255,0.45)',
+        background: 'rgba(232,245,233,0.45)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
-        border: '1px solid rgba(255,255,255,0.55)',
+        border: '1px solid rgba(200,230,201,0.60)',
         borderTop: '3px solid #1B5E20',
         boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
         transition: 'transform 250ms ease-out, box-shadow 250ms ease-out, background 250ms ease-out',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.58)'
+        e.currentTarget.style.background = 'rgba(232,245,233,0.62)'
         e.currentTarget.style.boxShadow  = '0 8px 32px rgba(0,0,0,0.18)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.45)'
+        e.currentTarget.style.background = 'rgba(232,245,233,0.45)'
         e.currentTarget.style.boxShadow  = '0 4px 24px rgba(0,0,0,0.12)'
       }}
     >
