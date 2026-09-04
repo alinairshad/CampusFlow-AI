@@ -104,6 +104,7 @@ async def list_mentors(
         {
             "is_mentor": True,
             "university_id": settings.UNIVERSITY_ID,
+            "user_id": {"$ne": current_user.user_id},   # never show the requester themselves
         },
         sort=[("name", 1)],
     )
@@ -150,6 +151,7 @@ async def search_mentors(
     filter_doc: dict = {
         "is_mentor": True,
         "university_id": settings.UNIVERSITY_ID,
+        "user_id": {"$ne": current_user.user_id},       # never show the requester themselves
     }
 
     if dept_stripped:

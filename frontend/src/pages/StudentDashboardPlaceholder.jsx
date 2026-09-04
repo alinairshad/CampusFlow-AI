@@ -147,7 +147,7 @@ function StatsRow({ appCount, convCount }) {
 // ---------------------------------------------------------------------------
 // Profile Card
 // ---------------------------------------------------------------------------
-function ProfileCard({ profile, token }) {
+function ProfileCard({ profile, token, onMentorToggled }) {
   const [isMentor, setIsMentor]   = useState(profile.is_mentor ?? false)
   const [toggling, setToggling]   = useState(false)
   const [toggleError, setToggleError] = useState('')
@@ -159,6 +159,8 @@ function ProfileCard({ profile, token }) {
     try {
       const updated = await updateStudentProfile({ is_mentor: next }, token)
       setIsMentor(updated.is_mentor)
+      // Refresh the seniors list so it immediately reflects the change
+      if (onMentorToggled) onMentorToggled()
     } catch (err) {
       setToggleError(err.response?.data?.detail ?? 'Update failed.')
     } finally {
@@ -514,6 +516,17 @@ export default function StudentDashboardPlaceholder() {
     ]).finally(() => setLoading(false))
   }, [token])
 
+  // Re-fetch only the seniors list (called after toggle change)
+  async function refreshMentors() {
+    try {
+      const data = await listMentors(token)
+      setMentors(data.mentors || [])
+      setMentorError(false)
+    } catch {
+      setMentorError(true)
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-50/80 overflow-hidden">
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onSignOut={logout} />
@@ -548,7 +561,7 @@ export default function StudentDashboardPlaceholder() {
                 <div className="md:col-span-2">
                   <WelcomeBanner name={dashboard.profile.name} />
                 </div>
-                <ProfileCard profile={dashboard.profile} token={token} />
+                <ProfileCard profile={dashboard.profile} token={token} onMentorToggled={refreshMentors} />
               </div>
 
               {/* 2. Stats */}
