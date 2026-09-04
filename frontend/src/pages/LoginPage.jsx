@@ -108,13 +108,13 @@ export default function LoginPage() {
            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.12) 35%, rgba(0,0,0,0.12) 65%, rgba(0,0,0,0.48) 100%)' }} />
 
       {/* ── Login card ─────────────────────────────────────────────── */}
-      <div className="relative z-10 w-full max-w-[420px] bg-white rounded-2xl
+      <div className="relative z-10 w-full max-w-[380px] bg-white rounded-2xl
                       shadow-2xl border border-gray-100 overflow-hidden">
 
         {/* Green top accent bar */}
         <div className="h-1 bg-lgu-700" />
 
-        <div className="px-8 py-8">
+        <div className="px-7 py-7">
 
           {/* ── Branding ───────────────────────────────────────────── */}
           <div className="flex flex-col items-center mb-7">
@@ -127,9 +127,6 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
               CampusFlow AI
             </h1>
-            <span className={`mt-2 text-xs font-semibold px-3 py-1 rounded-full border ${roleBadgeColor}`}>
-              {roleLabel}
-            </span>
           </div>
 
           {/* ── Success banner ─────────────────────────────────────── */}
@@ -154,17 +151,10 @@ export default function LoginPage() {
                 Email
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                       fill="currentColor" className="w-4 h-4">
-                    <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z" />
-                    <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z" />
-                  </svg>
-                </span>
                 <input
                   type="email" name="email" value={form.email}
                   onChange={handleChange} required
-                  className={inputCls + ' pl-10'}
+                  className={inputCls}
                   placeholder="you@lgu.edu.pk"
                   autoComplete="email"
                 />
@@ -178,17 +168,11 @@ export default function LoginPage() {
                 Password
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                       fill="currentColor" className="w-4 h-4">
-                    <path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clipRule="evenodd" />
-                  </svg>
-                </span>
                 <input
                   type={showPw ? 'text' : 'password'}
                   name="password" value={form.password}
                   onChange={handleChange} required
-                  className={inputCls + ' pl-10 pr-11'}
+                  className={inputCls + ' pr-11'}
                   placeholder="••••••••"
                   autoComplete="current-password"
                 />
