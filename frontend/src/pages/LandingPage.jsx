@@ -14,21 +14,20 @@ function RoleCard({ icon, label, to, state, iconBg }) {
                  hover:-translate-y-1 hover:scale-[1.025]
                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
       style={{
-        background: 'rgba(255,255,255,0.96)',
-        backdropFilter: 'blur(18px)',
-        WebkitBackdropFilter: 'blur(18px)',
+        background: 'rgba(255,255,255,0.75)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.28)',
+        borderTop: '3px solid #1B5E20',
         boxShadow: '0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15)',
         transition: 'transform 250ms ease-out, box-shadow 250ms ease-out, border-color 250ms ease-out, background 250ms ease-out',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background    = 'rgba(255,255,255,1)'
-        e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.42)'
+        e.currentTarget.style.background    = 'rgba(255,255,255,0.88)'
         e.currentTarget.style.boxShadow     = '0 8px 32px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.20)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background    = 'rgba(255,255,255,0.96)'
-        e.currentTarget.style.borderColor   = 'rgba(255,255,255,0.28)'
+        e.currentTarget.style.background    = 'rgba(255,255,255,0.75)'
         e.currentTarget.style.boxShadow     = '0 4px 24px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.15)'
       }}
     >
