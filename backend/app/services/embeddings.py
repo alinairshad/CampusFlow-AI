@@ -15,6 +15,19 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
+# Module-level shared client (connection pool reuse across requests)
+# ---------------------------------------------------------------------------
+_embed_client: httpx.AsyncClient | None = None
+
+
+def _get_embed_client() -> httpx.AsyncClient:
+    global _embed_client
+    if _embed_client is None or _embed_client.is_closed:
+        _embed_client = httpx.AsyncClient(timeout=60.0)
+    return _embed_client
+
+
+# ---------------------------------------------------------------------------
 # Internal HTTP helper
 # ---------------------------------------------------------------------------
 
@@ -40,23 +53,23 @@ async def _call_embeddings_api(input_payload: Union[str, list[str]]) -> list[dic
         "encoding_format": "float",
     }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        try:
-            response = await client.post(
-                url,
-                json=payload,
-                headers={
-                    "Authorization": f"Bearer {settings.LLM_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-            )
-        except httpx.TimeoutException as exc:
-            raise RuntimeError(
-                "Embedding API request timed out after 60 s. "
-                "Try again or check OpenRouter status."
-            ) from exc
-        except httpx.RequestError as exc:
-            raise RuntimeError(f"Network error reaching embedding API: {exc}") from exc
+    client = _get_embed_client()
+    try:
+        response = await client.post(
+            url,
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {settings.LLM_API_KEY}",
+                "Content-Type": "application/json",
+            },
+        )
+    except httpx.TimeoutException as exc:
+        raise RuntimeError(
+            "Embedding API request timed out after 60 s. "
+            "Try again or check OpenRouter status."
+        ) from exc
+    except httpx.RequestError as exc:
+        raise RuntimeError(f"Network error reaching embedding API: {exc}") from exc
 
     # Surface clear, actionable errors for the most common failure modes
     if response.status_code == 401:

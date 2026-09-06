@@ -20,6 +20,23 @@ logger = logging.getLogger(__name__)
 # Request timeout: generous for generation calls, LLMs can be slow
 _TIMEOUT = httpx.Timeout(timeout=120.0, connect=10.0)
 
+# ---------------------------------------------------------------------------
+# Module-level shared client (connection pool reuse across requests)
+# ---------------------------------------------------------------------------
+# A single AsyncClient is created at import time and reused for all LLM calls
+# within the same worker process, avoiding the per-call TCP handshake overhead
+# (~30-80ms per call with a fresh client).  httpx.AsyncClient is thread-safe
+# and concurrency-safe for async usage.
+_llm_client: httpx.AsyncClient | None = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    """Return (or create) the shared LLM httpx client."""
+    global _llm_client
+    if _llm_client is None or _llm_client.is_closed:
+        _llm_client = httpx.AsyncClient(timeout=_TIMEOUT)
+    return _llm_client
+
 
 class LLMError(Exception):
     """Base class for LLM client errors — carries an HTTP status code."""
@@ -98,22 +115,21 @@ async def chat_completion(
         chosen_model, len(messages), json_mode,
     )
 
-    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-        try:
-            response = await client.post(
-                url,
-                json=payload,
-                headers={
-                    "Authorization": f"Bearer {settings.LLM_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-            )
-        except httpx.TimeoutException as exc:
-            raise LLMError("LLM request timed out after 120 s.") from exc
-        except httpx.RequestError as exc:
-            raise LLMError(f"Network error reaching LLM API: {exc}") from exc
+    client = _get_client()
+    try:
+        response = await client.post(
+            url,
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {settings.LLM_API_KEY}",
+                "Content-Type": "application/json",
+            },
+        )
+    except httpx.TimeoutException as exc:
+        raise LLMError("LLM request timed out after 120 s.") from exc
+    except httpx.RequestError as exc:
+        raise LLMError(f"Network error reaching LLM API: {exc}") from exc
 
-    # Map status codes to typed exceptions
     if response.status_code == 401:
         raise LLMAuthError(
             "LLM API returned 401 — check LLM_API_KEY in .env.",
