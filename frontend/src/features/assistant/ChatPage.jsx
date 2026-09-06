@@ -19,6 +19,93 @@ import ActionPlanCard from './ActionPlanCard'
 import Navbar from '../../components/Navbar'
 
 // ---------------------------------------------------------------------------
+// Lightweight markdown renderer — assistant messages only.
+// Supports: **bold**, bullet lists (- / * / •), numbered lists, paragraphs.
+// No external dependency. User messages are never passed through this.
+// ---------------------------------------------------------------------------
+function MarkdownText({ content }) {
+  if (!content) return null
+
+  // Split into blocks on blank lines (paragraph / list boundaries)
+  const blocks = content.split(/\n{2,}/).filter(Boolean)
+
+  return (
+    <div className="text-sm text-gray-800 leading-relaxed space-y-2">
+      {blocks.map((block, bi) => {
+        const lines = block.split('\n').filter(Boolean)
+
+        // Numbered list: lines starting with "1." "2." etc.
+        if (lines.every(l => /^\d+\.\s/.test(l.trim()))) {
+          return (
+            <ol key={bi} className="list-decimal list-outside pl-5 space-y-1">
+              {lines.map((l, li) => (
+                <li key={li}>{renderInline(l.replace(/^\d+\.\s/, '').trim())}</li>
+              ))}
+            </ol>
+          )
+        }
+
+        // Bullet list: lines starting with - * or •
+        if (lines.every(l => /^[-*•]\s/.test(l.trim()))) {
+          return (
+            <ul key={bi} className="list-disc list-outside pl-5 space-y-1">
+              {lines.map((l, li) => (
+                <li key={li}>{renderInline(l.replace(/^[-*•]\s/, '').trim())}</li>
+              ))}
+            </ul>
+          )
+        }
+
+        // Mixed block — some lines are bullets, some plain prose
+        // Render line by line
+        if (lines.some(l => /^[-*•]\s/.test(l.trim()) || /^\d+\.\s/.test(l.trim()))) {
+          return (
+            <div key={bi} className="space-y-1">
+              {lines.map((l, li) => {
+                const trimmed = l.trim()
+                if (/^[-*•]\s/.test(trimmed)) {
+                  return (
+                    <div key={li} className="flex gap-2">
+                      <span className="mt-0.5 shrink-0 text-lgu-600 font-bold leading-snug">·</span>
+                      <span>{renderInline(trimmed.replace(/^[-*•]\s/, ''))}</span>
+                    </div>
+                  )
+                }
+                if (/^\d+\.\s/.test(trimmed)) {
+                  const [num, ...rest] = trimmed.split(/\.\s/)
+                  return (
+                    <div key={li} className="flex gap-2">
+                      <span className="shrink-0 font-semibold text-lgu-600 leading-snug">{num}.</span>
+                      <span>{renderInline(rest.join('. '))}</span>
+                    </div>
+                  )
+                }
+                return <p key={li}>{renderInline(trimmed)}</p>
+              })}
+            </div>
+          )
+        }
+
+        // Plain paragraph (possibly multi-line prose)
+        return <p key={bi}>{renderInline(block.trim())}</p>
+      })}
+    </div>
+  )
+}
+
+/** Render inline markdown: **bold** only. Returns an array of React nodes. */
+function renderInline(text) {
+  if (!text.includes('**')) return text
+  const parts = text.split(/(\*\*[^*]+\*\*)/)
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-semibold text-gray-900">{part.slice(2, -2)}</strong>
+    }
+    return part
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Sub-components (unchanged)
 // ---------------------------------------------------------------------------
 
@@ -78,9 +165,7 @@ function AssistantBubble({ content, type, sources, found, actionPlan, conversati
                 </span>
               )}
 
-              <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
-                {content}
-              </p>
+              <MarkdownText content={content} />
 
               {found === false && sources.length === 0 && (
                 <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
