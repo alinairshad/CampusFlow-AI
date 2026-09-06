@@ -66,7 +66,9 @@ export default function LandingPage() {
         src="/lgu-campus.jpg"
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover object-center"
       />
 
       {/* ── Overlay — vignette on edges only, center stays bright

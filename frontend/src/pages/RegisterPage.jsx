@@ -46,7 +46,7 @@ export default function RegisterPage() {
          style={{ backgroundColor: '#1a2e1a' }}>
 
       {/* Campus background */}
-      <img src="/lgu-campus.jpg" alt="" aria-hidden="true"
+      <img src="/lgu-campus.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async"
            className="absolute inset-0 w-full h-full object-cover object-center" />
 
       {/* Vignette overlay */}
@@ -102,7 +102,7 @@ export default function RegisterPage() {
                      autoComplete="new-password" />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
                   Department

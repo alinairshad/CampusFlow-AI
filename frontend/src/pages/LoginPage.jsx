@@ -100,7 +100,7 @@ export default function LoginPage() {
          style={{ backgroundColor: '#1a2e1a' }}>
 
       {/* Campus background image */}
-      <img src="/lgu-campus.jpg" alt="" aria-hidden="true"
+      <img src="/lgu-campus.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async"
            className="absolute inset-0 w-full h-full object-cover object-center" />
 
       {/* Vignette overlay — matches LandingPage center brightness */}
