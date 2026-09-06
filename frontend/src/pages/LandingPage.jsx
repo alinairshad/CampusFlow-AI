@@ -63,7 +63,7 @@ export default function LandingPage() {
 
       {/* ── Background image ─────────────────────────────────────────── */}
       <img
-        src="/lgu-campus.jpg"
+        src="/lgu-campus.webp"
         alt=""
         aria-hidden="true"
         loading="lazy"

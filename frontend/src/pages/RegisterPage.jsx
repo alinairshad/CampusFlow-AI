@@ -46,7 +46,7 @@ export default function RegisterPage() {
          style={{ backgroundColor: '#1a2e1a' }}>
 
       {/* Campus background */}
-      <img src="/lgu-campus.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async"
+      <img src="/lgu-campus.webp" alt="" aria-hidden="true" loading="lazy" decoding="async"
            className="absolute inset-0 w-full h-full object-cover object-center" />
 
       {/* Vignette overlay */}
