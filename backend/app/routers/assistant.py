@@ -331,6 +331,7 @@ async def get_conversation_detail(
                 type=m.get("type"),
                 sources=sources,
                 found=m.get("found"),
+                action_plan=m.get("action_plan"),
                 created_at=m["created_at"],
             )
         )

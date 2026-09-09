@@ -29,6 +29,7 @@ class ConversationMessage(BaseModel):
     type: Optional[Literal["knowledge", "problem", "application"]] = None
     sources: list[ConversationSource] = []
     found: Optional[bool] = None          # True / False / None for user messages
+    action_plan: Optional[dict] = None    # Populated on problem-type assistant messages only
     created_at: datetime
 
 
