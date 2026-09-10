@@ -1,270 +1,319 @@
 # CampusFlow AI
 
-An AI-powered university companion that helps students navigate academic life.
-Students can ask questions about university policies, get step-by-step action
-plans for administrative problems, generate formal application letters, and
-browse the university directory — all grounded in uploaded university documents.
+> From *"I have a problem"* to a stamped PDF in your hand — all in one conversation.
 
-**Live demo**
-- Frontend: https://campus-flow-ai-delta.vercel.app
-- Backend API: https://backend-65be032f.fastapicloud.dev/docs
+CampusFlow AI is an intelligent university companion built for Lahore Garrison University. Unlike a generic chatbot that answers questions and stops there, CampusFlow closes the full loop: it classifies your intent, retrieves answers from verified university documents via RAG, converts your problem into a concrete action plan (correct department, required documents, exact steps), generates a ready-to-submit formal application pre-filled with your profile data, and exports it as a formatted PDF. No more guessing which office to visit, no more writing letters from scratch, no more getting answers that aren't backed by an actual policy.
 
 ---
 
-## Architecture
+## 🔗 Live Demo
 
-```
-Vercel (React + Vite + Tailwind v4)
-        │  HTTPS
-FastAPI Cloud (Python 3.11 + FastAPI 0.115)
-        │  Motor async driver
-MongoDB Atlas M0 (vector search + document storage)
-        │
-OpenRouter API (text-embedding-3-small + gpt-4o-mini)
-```
+| | URL |
+|---|---|
+| **Frontend** | https://campus-flow-ai-delta.vercel.app |
+| **Backend API** | https://backend-65be032f.fastapicloud.dev |
 
-**Key flows:**
-- **RAG Q&A** — student query → embed → Atlas Vector Search → threshold check → grounded LLM answer
-- **Problem-to-Action** — classify intent → retrieve context → structured JSON action plan
-- **Application Generator** — student profile + conversation context + KB retrieval → formal letter → ReportLab PDF
-- **Directory** — MongoDB `$text` search + unified vector/keyword search endpoint
+### Demo Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Student | `admin2@university.edu` | `alina1234` |
+| Admin | `admin@university.edu` | `Admin1234` |
+
+> **Cold-start note:** The backend runs on a free tier that scales to zero after inactivity. If the first request feels slow (5–10 s), hit the app once and wait — subsequent requests are fast. See [Deployment Notes](#deployment-notes) for how to warm it before a demo.
 
 ---
 
-## Local Development Setup
+## ✨ Features
+
+### AI Assistant (RAG-based Q&A)
+Ask any question about fees, exams, scholarships, registration, or academic policy. Answers are generated exclusively from uploaded university documents — the system never fabricates policies. Every answer includes source-document citations so students can verify what they're reading.
+
+### Problem-to-Action Assistant
+Describe a real administrative problem in plain language ("My grade is wrong" / "I can't pay my challan this semester"). The system classifies the intent, retrieves relevant policy context, and returns a structured action plan: the responsible department, documents you'll need, ordered steps to take, and a single highlighted next action.
+
+### AI Application Generator with PDF Export
+One click from an action plan generates a complete, formal application letter pre-filled with your name, department, semester, and batch. If required information is missing, the system asks a clarifying question first. The generated letter is editable, copyable, and downloadable as a properly formatted PDF (university header, date, recipient block, body, signature line).
+
+### University Directory
+Browse and search all university departments and offices. Each entry shows location, working hours, contact details, and services offered. Admins manage entries through the admin panel; changes appear immediately in student views.
+
+### University Societies
+Discover clubs and societies — Tech, Sports, Literary, Arts, Social Welfare, Cultural — with descriptions, how-to-join instructions, faculty advisors, and contact details. Filter by category or search by name.
+
+### Senior-Junior Mentorship Directory
+Senior students opt in to be listed as mentors from their dashboard. Junior students can browse by department, search by name or interest, and contact seniors directly by email. No in-app messaging — straightforward, low-friction peer connection.
+
+### Student Dashboard
+A personalised landing page showing your profile, recent applications with status, recent AI conversations, mentor suggestions, and quick-access links to every feature.
+
+### Admin Dashboard
+Upload and manage knowledge-base documents (PDF, DOCX, TXT), manage directory and society entries, and view live usage statistics (total documents, students, AI queries handled, and directory entries).
+
+### Conversation History
+Every AI conversation is saved. The sidebar on the Assistant page lists past conversations with previews and timestamps — click any to resume exactly where you left off, including fully reconstructed action plan cards.
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 18, Vite, Tailwind CSS v4 |
+| **Backend** | Python 3.12, FastAPI, Motor (async MongoDB driver) |
+| **Database** | MongoDB Atlas (M0 free tier) + Atlas Vector Search |
+| **AI / LLM** | OpenRouter API → `openai/gpt-4o-mini` (chat) + `openai/text-embedding-3-small` (embeddings) |
+| **PDF generation** | ReportLab (Python-native, no binary dependency) |
+| **Frontend deploy** | Vercel |
+| **Backend deploy** | FastAPI Cloud (free tier) |
+| **Auth** | JWT (HS256), bcrypt password hashing |
+
+---
+
+## 🏗 Architecture
+
+```
+Student Browser (React + Vite)
+        │  HTTPS / JWT Bearer
+        ▼
+FastAPI Backend
+  ┌─────────────────────────────────────────────────┐
+  │  POST /assistant/query  (single AI entrypoint)   │
+  │                                                  │
+  │  1. Intent Classifier  ── LLM call ──► {category,│
+  │                                         type}    │
+  │  2. Router (code, not LLM):                      │
+  │     type=knowledge  → RAG Answer pipeline        │
+  │     type=problem    → Action Plan pipeline       │
+  │     type=application→ Application Generator      │
+  │                                                  │
+  │  RAG pipeline:                                   │
+  │    Embed query → Atlas Vector Search (top-k)     │
+  │    → cosine threshold check                      │
+  │    → [below threshold] deterministic not-found   │
+  │    → [above threshold] grounded LLM answer       │
+  │    → source citations attached                   │
+  └─────────────────────────────────────────────────┘
+        │                         │
+        ▼                         ▼
+  MongoDB Atlas              OpenRouter API
+  (data + vector index)      (LLM + embeddings)
+```
+
+**One pipeline, three use cases.** The same embed → retrieve → threshold → generate chain powers the Q&A assistant, the problem action planner, and the application generator. The intent classifier decides which flavour of prompt and response schema to use; the retrieval and grounding logic is shared.
+
+**Why MongoDB for vectors?** Atlas Vector Search eliminates a second service (Pinecone / Chroma / Weaviate), a second connection string, and a sync problem — one database, one connection, free tier friendly. The tradeoff is that the vector index must be created manually once in the Atlas UI (it's a Search Index, not a standard `createIndex` call).
+
+---
+
+## 🤖 How Kiro Was Used
+
+This project was built spec-first using [Kiro](https://kiro.dev) for the **Build with Kiro 2026 Hackathon**.
+
+The `.kiro/specs/` directory contains three files that were written before a single line of implementation code:
+
+- **`requirements.md`** — 18 numbered requirements (user stories + acceptance criteria), covering every feature from authentication through roll-number validation
+- **`design.md`** — full system architecture: database schema, API contract, RAG pipeline diagram, frontend structure, security model, and UI design specs for every component
+- **`tasks.md`** — 100+ concrete implementation tasks grouped into 18 stages (Stage 0 through Stage 18), each task referencing the requirement it satisfies
+
+Kiro used these specs to implement every stage sequentially, with the git history reflecting the task-by-task progression — you can see commits like `Stage 3, Task 3.1: llm_client.py + intent_classifier` followed by `Stage 3, Task 3.7: POST /assistant/query orchestration`. The specs weren't written after the fact; they shaped what got built and in what order.
+
+Kiro also performed the pre-submission QA pass, identified 25+ issues (ranging from a critical `action_plan` data-loss bug in conversation history to a missing `/mentors` link in the navbar), and fixed the prioritised ones — with the fix commits in history.
+
+---
+
+## 🚀 Local Development Setup
 
 ### Prerequisites
-- Python 3.11
-- Node.js 20+
-- A MongoDB Atlas account (M0 free tier works)
-- An OpenRouter API key (https://openrouter.ai)
+
+- Python 3.12+
+- Node.js 18+
+- A MongoDB Atlas cluster (free M0 tier is sufficient) with a Vector Search index on `document_chunks.embedding`
+- An OpenRouter API key (for LLM + embeddings)
 
 ### Backend
 
 ```bash
 cd backend
 
-# Create and activate virtual environment
+# Create and activate a virtual environment
 python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # macOS/Linux
+source venv/bin/activate        # Linux / macOS
+# .\venv\Scripts\activate       # Windows PowerShell
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Copy env template and fill in your values
+# Configure environment
 cp .env.example .env
-# Edit .env — set MONGODB_URI, JWT_SECRET, LLM_API_KEY at minimum
-```
+# Edit .env — fill in MONGODB_URI, JWT_SECRET, LLM_API_KEY
 
-**Required `.env` values:**
-
-| Variable | Where to get it |
-|---|---|
-| `MONGODB_URI` | Atlas dashboard → Connect → Drivers |
-| `JWT_SECRET` | `python -c "import secrets; print(secrets.token_hex(32))"` |
-| `LLM_API_KEY` | https://openrouter.ai/keys |
-
-```bash
-# Seed the admin account
-python scripts/seed_admin.py   # needs ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME in .env
+# Seed the admin account (run once)
+python scripts/seed_admin.py
 
 # Start the development server
-uvicorn app.main:app --reload
-# API docs: http://localhost:8000/docs
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
 
 ### Frontend
 
 ```bash
 cd frontend
 
+# Install dependencies
 npm install
 
-# Copy env template
+# Configure environment
 cp .env.example .env
-# Edit .env — set VITE_API_BASE_URL=http://localhost:8000
+# .env already points to http://localhost:8000 — no changes needed for local dev
 
+# Start the dev server
 npm run dev
-# App: http://localhost:5173
 ```
 
-### Atlas Vector Search index (one-time manual setup)
+The app will be at `http://localhost:5173`.
 
-After the backend starts and documents are uploaded, create the vector index
-in the Atlas UI:
+### Atlas Vector Search Index
 
-1. Atlas UI → cluster → Browse Collections → `campusflow` → `document_chunks`
-2. "Search Indexes" tab → Create Search Index → JSON editor → paste:
+The standard `createIndex()` calls in `mongo.py` handle all regular indexes on startup. The **vector index** must be created once manually in the Atlas UI:
+
+1. Atlas → your cluster → **Search** tab → **Create Search Index**
+2. Choose **Atlas Vector Search** (not the regular text search)
+3. Collection: `campusflow.document_chunks`
+4. Index definition:
 
 ```json
 {
-  "name": "document_chunks_vector_index",
-  "type": "vectorSearch",
-  "definition": {
-    "fields": [
-      { "type": "vector", "path": "embedding", "numDimensions": 1536, "similarity": "cosine" },
-      { "type": "filter", "path": "university_id" },
-      { "type": "filter", "path": "category" }
-    ]
-  }
+  "fields": [
+    {
+      "type": "vector",
+      "path": "embedding",
+      "numDimensions": 1536,
+      "similarity": "cosine"
+    },
+    {
+      "type": "filter",
+      "path": "university_id"
+    },
+    {
+      "type": "filter",
+      "path": "category"
+    }
+  ]
 }
 ```
 
----
+5. Index name: `document_chunks_vector_index`
 
-## Deployment
+No documents will be retrievable by the AI until this index is created.
 
-### Backend — FastAPI Cloud
+### Environment Variables Reference
 
-The backend is deployed to [FastAPI Cloud](https://fastapicloud.com) using
-their CLI. `pyproject.toml` defines the project and `backend/.fastapicloudignore`
-controls what is uploaded.
+**Backend** (see `backend/.env.example` for the full list):
 
-**Install the deploy CLI (one-time, not a project dependency):**
-```bash
-pip install fastapi-cloud-cli
-```
+| Variable | Description |
+|---|---|
+| `MONGODB_URI` | MongoDB Atlas connection string |
+| `JWT_SECRET` | Long random string for signing tokens — generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `LLM_API_KEY` | OpenRouter API key |
+| `LLM_API_BASE` | OpenRouter base URL (default: `https://openrouter.ai/api/v1`) |
+| `EMBEDDING_MODEL` | Embedding model identifier (default: `openai/text-embedding-3-small`) |
+| `CHAT_MODEL` | Chat model identifier (default: `openai/gpt-4o-mini`) |
+| `RAG_MIN_SCORE` | Cosine similarity threshold for Q&A retrieval (default: `0.7`) |
+| `UNIVERSITY_ID` | Fixed university identifier for MVP (default: `university_mvp_001`) |
+| `ALLOWED_ORIGINS` | Comma-separated CORS origins (e.g. `http://localhost:5173,https://your-app.vercel.app`) |
 
-**Deploy:**
-```bash
-cd backend
-fastapi login     # opens browser for auth
-fastapi deploy    # first time: prompts to create/link an app
-```
+**Frontend** (see `frontend/.env.example`):
 
-**Environment variables — set in FastAPI Cloud dashboard → Variables tab:**
-
-Non-sensitive (can also be set from CLI):
-```
-DATABASE_NAME=campusflow
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-LLM_API_BASE=https://openrouter.ai/api/v1
-EMBEDDING_MODEL=openai/text-embedding-3-small
-CHAT_MODEL=openai/gpt-4o-mini
-RAG_MIN_SCORE=0.7
-ACTION_PLAN_MIN_SCORE=0.65
-UNIVERSITY_ID=uni_001
-ALLOWED_ORIGINS=https://your-app.vercel.app,http://localhost:5173
-```
-
-Secrets (use the secret variable UI — these cannot be viewed after creation):
-```
-MONGODB_URI      ← Atlas connection string
-JWT_SECRET       ← long random hex
-LLM_API_KEY      ← OpenRouter API key
-```
-
-After deploying, go to Settings → Networking → **Generate Domain** to get
-the public URL.
-
-### Frontend — Vercel
-
-```bash
-# Install Vercel CLI (optional — can also use the web dashboard)
-npm i -g vercel
-vercel --cwd frontend
-```
-
-Or import via the Vercel dashboard:
-1. New Project → import GitHub repo → set Root Directory to `frontend/`
-2. Add environment variable: `VITE_API_BASE_URL=https://your-backend.fastapicloud.dev`
-3. Deploy
-
-`frontend/vercel.json` handles SPA routing (all paths → `index.html`) and
-adds security headers automatically.
+| Variable | Description |
+|---|---|
+| `VITE_API_BASE_URL` | Backend URL (`http://localhost:8000` for local dev, or your deployed backend URL for production) |
 
 ---
 
-## Common Issues & Gotchas
+## ☁️ Deployment Notes
 
-### MongoDB Atlas Network Access — most important
+### Current setup
 
-> **If the backend starts successfully locally but fails in production with
-> connection errors or 503s, this is almost certainly the cause.**
+| Service | Platform |
+|---|---|
+| Backend | [FastAPI Cloud](https://fastapicloud.com) (free tier) |
+| Frontend | [Vercel](https://vercel.com) (Hobby tier) |
+| Database | [MongoDB Atlas](https://www.mongodb.com/atlas) (M0 free cluster) |
 
-Atlas M0 free tier blocks all connections by default. You must whitelist
-the backend's IP — or for cloud platforms where IPs are dynamic:
+### Deploying the backend (FastAPI Cloud)
 
-1. Atlas UI → Network Access → Add IP Address
-2. Add `0.0.0.0/0` (allow from anywhere)
+1. Push the repo — FastAPI Cloud detects `pyproject.toml` automatically.
+2. Set all environment variables from `backend/.env.example` in the dashboard.
+3. The `ALLOWED_ORIGINS` variable should include your Vercel frontend URL.
 
-This is safe for an M0 cluster that already requires a username/password.
-Without this step, FastAPI Cloud's servers cannot reach Atlas and every
-request that touches the database will fail.
+### Deploying the frontend (Vercel)
 
-### FastAPI Cloud cold starts (Hobby plan)
+1. Connect the GitHub repo to Vercel, set root directory to `frontend/`.
+2. Set `VITE_API_BASE_URL` to your FastAPI Cloud backend URL.
+3. Vercel picks up `vercel.json` (SPA rewrite rule + security headers) automatically.
 
-The Hobby plan always scales to zero when idle. After a period of inactivity:
-- The first request triggers a cold start (5–15 seconds to wake up)
-- The app connects to Atlas during startup, so the first real request usually
-  succeeds once the container is ready
+### ⚠️ Critical gotcha #1 — MongoDB Atlas Network Access
 
-**Before a live demo:** open `https://your-backend.fastapicloud.dev/health`
-60–90 seconds before you need it. Wait for `{"status": "ok"}` — that confirms
-the container is warm and Atlas is connected. Subsequent requests will be fast.
+Atlas M0 clusters restrict inbound connections to explicitly allowed IP addresses. FastAPI Cloud (and Render's free tier) does not have static egress IPs. If you see SSL handshake failures or connection timeouts from the deployed backend when it connects to Atlas, go to:
 
-If the Hobby plan's scale-to-zero causes persistent issues, upgrading to
-FastAPI Cloud Pro (minimum 1 replica) or switching to a platform that supports
-always-on free tiers (Railway, Fly.io) will solve it permanently.
+**Atlas → Network Access → Add IP Address → Allow access from anywhere (`0.0.0.0/0`)**
 
-### pydantic-settings and ALLOWED_ORIGINS
+This was the fix that unblocked deployment. For a production system you would restrict to specific IPs; for a free-tier hackathon deploy, `0.0.0.0/0` is the pragmatic answer.
 
-`ALLOWED_ORIGINS` is stored as a plain string in the Settings model (not
-`List[str]`) to avoid pydantic-settings v2's automatic JSON parsing of list
-fields. The `settings.allowed_origins_list` property converts it at access
-time. Both formats work:
+### ⚠️ Critical gotcha #2 — Cold-start mitigation
 
-```
-# Plain (recommended for dashboard entry — no quoting needed):
-ALLOWED_ORIGINS=https://app.vercel.app,http://localhost:5173
+The free tier scales to zero after ~15 minutes of inactivity. The first request after an idle period takes 5–15 seconds while the container starts.
 
-# JSON array (also accepted):
-ALLOWED_ORIGINS=["https://app.vercel.app","http://localhost:5173"]
-```
-
-### passlib / bcrypt incompatibility
-
-`passlib==1.7.4` is incompatible with `bcrypt>=4.1` (passlib's wrap-bug
-detection triggers a hard error). This project uses `bcrypt` directly
-(not via passlib) for password hashing. `passlib` is intentionally absent
-from `requirements.txt`.
-
-### `fastapi[standard]` is required
-
-FastAPI Cloud's runtime starts the app with `fastapi run`, which requires
-the `fastapi` CLI binary. This binary is only installed when the
-`[standard]` extra is included. Plain `fastapi==x.x.x` without `[standard]`
-will cause `"sh: fastapi: not found"` at startup.
-
-The `[standard]` extra was added to `fastapi` in version 0.112.0 — pinning
-to `0.111.0` or earlier will silently ignore the extra and still fail.
-This project pins `fastapi[standard]==0.115.0`.
+**Before any live demo:** open `https://backend-65be032f.fastapicloud.dev/health` in your browser about 30 seconds before you start. You'll see `{"status":"ok"}` when the server is warm. All subsequent requests will be fast.
 
 ---
 
-## Project Structure
+## 📸 Screenshots
 
-```
-CampusFlow AI/
-├── backend/
-│   ├── app/
-│   │   ├── core/          config, security, deps, rate_limit
-│   │   ├── db/            mongo.py (Motor async driver)
-│   │   ├── models/        Pydantic schemas
-│   │   ├── routers/       FastAPI route handlers
-│   │   └── services/      LLM, RAG, embeddings, PDF generation
-│   ├── scripts/           seed_admin.py
-│   ├── pyproject.toml     FastAPI Cloud entrypoint + dependencies
-│   ├── requirements.txt   pinned deps for local venv
-│   └── .fastapicloudignore
-├── frontend/
-│   ├── src/
-│   │   ├── api/           axios wrappers per feature
-│   │   ├── auth/          AuthContext, ProtectedRoute
-│   │   ├── features/      assistant, applications, admin, directory
-│   │   └── pages/         route-level components
-│   └── vercel.json        SPA rewrite + security headers
-└── .kiro/specs/           requirements.md, design.md, tasks.md
-```
+<!-- Add screenshots here -->
+
+*Screenshots coming soon — feature areas to capture:*
+- Landing page
+- Student Dashboard (sidebar layout)
+- AI Assistant with action plan card
+- Application Generator (generated letter + PDF download)
+- University Directory and Societies
+- Senior Directory
+- Admin Dashboard (stats + knowledge base upload)
+
+---
+
+## ⚠️ Known Limitations & Roadmap
+
+### Current limitations
+
+| Area | Limitation |
+|---|---|
+| **Knowledge base** | Seeded with limited real LGU data — primarily fee structure and a handful of policy excerpts. Most answers will be accurate for finance/registration topics; other topics may return "no verified information found" until more documents are uploaded. |
+| **Teacher role** | Not implemented. The system supports `student` and `admin` roles. A `teacher` role with course-management and grade-entry features is designed for but deferred. |
+| **Mentor contact** | Email-only. There is no in-app messaging — the Senior Directory shows contact emails for direct outreach. A messaging or scheduling feature is on the roadmap. |
+| **Rate limiting** | Per-user limits (10 AI queries/minute, 5 application generations/minute) are enforced in-memory. They reset on server restart and don't scale across multiple workers. A Redis-backed implementation is the next step. |
+| **DOCX table extraction** | `python-docx` extracts paragraph text only; tables and text boxes in DOCX files are skipped. Fee structure tables in DOCX format won't be fully extracted — upload as PDF or TXT instead. |
+| **Single university** | The data model is multi-university-ready (every record has a `university_id`), but the UI and registration flow are fixed to one university. A multi-tenant admin portal is a V2 feature. |
+| **JWT expiry UX** | Expired sessions pass the client-side route guard and only fail on the first API call. The UX could be improved with a proactive `exp` claim check on page load. |
+
+### Roadmap
+
+- Upload more real LGU policy documents to improve answer coverage
+- Teacher role (course management, grade submission)
+- In-app mentor messaging / meeting scheduling
+- Redis-backed rate limiting for multi-worker deployments
+- Personalized announcements (department/semester-targeted)
+- Interactive campus map (the directory schema already has optional lat/lng fields)
+- Mobile app (React Native, sharing the same backend)
+
+---
+
+## 🙏 Credits
+
+Built by **Alina Irshad** for the **[Build with Kiro 2026 Hackathon](https://kiro.dev)**.
+
+Development was driven end-to-end by [Kiro](https://kiro.dev) — Kiro's agentic spec workflow (`.kiro/specs/`) was used to write requirements and design documents before any code, then implement every stage task-by-task, and finally run a structured QA pass to find and fix issues before submission. The git history is a faithful record of that process.
